@@ -1,0 +1,45 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Button from '../../components/Button.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProseWrap from '../../components/ProseWrap.astro';
+import { longDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('news');
+  return articles.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const kindNames: Record<string, string> = { news: 'News', announcement: 'Announcement', insight: 'Insight' };
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'News', href: '/news/' },
+  { label: entry.data.title },
+];
+---
+
+<Layout title={entry.data.title} description={entry.data.summary}>
+  <PageHero
+    eyebrow={`${kindNames[entry.data.kind]} · ${longDate(entry.data.date)}`}
+    title={entry.data.title}
+    lead={entry.data.summary}
+    crumbs={crumbs}
+    sample={entry.data.sample}
+  />
+
+  <article class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <div class="max-w-[68ch]">
+      <ProseWrap>
+        <Content />
+      </ProseWrap>
+    </div>
+    <div class="mt-16 border-t border-line pt-8">
+      <Button href="/news/" variant="link">← All news</Button>
+    </div>
+  </article>
+</Layout>

@@ -1,0 +1,27 @@
+---
+interface Props {
+  number?: string;
+  label?: string;
+  title: string;
+  lead?: string;
+  id?: string;
+}
+
+const { number, label, title, lead, id } = Astro.props;
+---
+
+<header class="grid gap-6 md:grid-cols-[1fr_1.1fr] md:items-end md:gap-16" data-reveal>
+  <div>
+    {
+      (number || label) && (
+        <p class="eyebrow">
+          {number && <span class="text-muted">{number}</span>}
+          {number && label && <span class="mx-2 text-line">/</span>}
+          {label}
+        </p>
+      )
+    }
+    <h2 class="mt-4" id={id}>{title}</h2>
+  </div>
+  {lead && <p class="text-lg leading-relaxed text-muted md:pb-1">{lead}</p>}
+</header>

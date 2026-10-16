@@ -1,0 +1,18 @@
+---
+import { site } from '../config/site';
+
+const phoneHref = `tel:${site.phone.replace(/\s/g, '')}`;
+---
+
+<section aria-label="Institute links" class="border-b border-line bg-band">
+  <div class="mx-auto flex w-full max-w-page flex-wrap items-center justify-between gap-x-6 gap-y-1 px-5 py-2 text-[0.8rem] text-muted sm:px-8">
+    <a href={site.instituteUrl} class="hover:text-ink">
+      {site.institute}
+      <span aria-hidden="true">↗</span>
+    </a>
+    <div class="flex items-center gap-5">
+      <a href={`mailto:${site.email}`} class="hover:text-ink">{site.email}</a>
+      <a href={phoneHref} class="hidden hover:text-ink sm:inline"><span set:html={site.phoneHtml} /></a>
+    </div>
+  </div>
+</section>

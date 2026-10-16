@@ -1,0 +1,18 @@
+---
+// A statistic: the final value is rendered on the server. A small script in Layout counts up to it once the
+// figure is on screen, unless the visitor has asked for reduced motion.
+interface Props {
+  value: number;
+  label: string;
+  suffix?: string;
+}
+
+const { value, label, suffix } = Astro.props;
+---
+
+<div class="py-2 md:px-10 md:first:pl-0 md:last:pr-0">
+  <div class="font-display text-6xl font-medium leading-none tabular-nums text-ink">
+    <span data-count={value} data-suffix={suffix}>{value}{suffix}</span>
+  </div>
+  <p class="mt-4 max-w-[16rem] text-sm leading-snug text-muted">{label}</p>
+</div>

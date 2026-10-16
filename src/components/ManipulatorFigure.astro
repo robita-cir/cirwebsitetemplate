@@ -1,0 +1,116 @@
+---
+// Technical-drawing figure: a planar three-link manipulator with joint angles and link lengths.
+// Geometry is computed from fixed angles and lengths, so the markup is identical on every build.
+type Pt = { x: number; y: number };
+
+const W = 560;
+const H = 500;
+const base: Pt = { x: 158, y: 404 };
+const links = [170, 128, 84];
+const angles = [74, 30, 74]; // absolute link directions, degrees from horizontal
+
+const rad = (deg: number) => (deg * Math.PI) / 180;
+// Screen coordinates: y grows downwards, so angles are flipped on the y axis.
+const polar = (c: Pt, r: number, deg: number): Pt => ({
+  x: c.x + r * Math.cos(rad(deg)),
+  y: c.y - r * Math.sin(rad(deg)),
+});
+const f = (p: Pt) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+const arc = (c: Pt, r: number, from: number, to: number) => {
+  const large = Math.abs(to - from) > 180 ? 1 : 0;
+  const sweep = to > from ? 0 : 1;
+  return `M ${f(polar(c, r, from))} A ${r} ${r} 0 ${large} ${sweep} ${f(polar(c, r, to))}`;
+};
+
+const joints: Pt[] = [base];
+angles.forEach((deg, i) => joints.push(polar(joints[i], links[i], deg)));
+const [j0, j1, j2, tip] = joints;
+
+// Point beside the midpoint of a link, on the upper-left side, for its dimension label.
+const beside = (a: Pt, b: Pt, deg: number, gap: number): Pt => {
+  const m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  return { x: m.x - gap * Math.sin(rad(deg)), y: m.y - gap * Math.cos(rad(deg)) };
+};
+
+// Gripper axes at the tip.
+const gAxis = { x: Math.cos(rad(angles[2])), y: -Math.sin(rad(angles[2])) };
+const gPerp = { x: Math.sin(rad(angles[2])), y: Math.cos(rad(angles[2])) };
+const g = (side: number, along: number): Pt => ({
+  x: tip.x + side * gPerp.x + along * gAxis.x,
+  y: tip.y + side * gPerp.y + along * gAxis.y,
+});
+
+const groundY = base.y + 16;
+---
+
+<figure class="figure-grid border border-line bg-paper">
+  <svg viewBox={`0 0 ${W} ${H}`} class="block h-auto w-full" role="img" aria-labelledby="manip-title manip-desc">
+    <title id="manip-title">Planar three-link manipulator</title>
+    <desc id="manip-desc">Schematic of a three-joint arm with joint angles theta 1 to 3 and link lengths l 1 to 3.</desc>
+
+    <defs>
+      <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="8" stroke="#d9dce3" stroke-width="2"></line>
+      </pattern>
+    </defs>
+
+    <!-- Axes, top left -->
+    <g stroke="#4a4f66" stroke-width="1.25" fill="none">
+      <line x1="52" y1="62" x2="98" y2="62"></line>
+      <line x1="52" y1="62" x2="52" y2="16"></line>
+    </g>
+    <text x="104" y="66" font-size="12" fill="#4a4f66" class="fig-mono">x</text>
+    <text x="46" y="12" font-size="12" fill="#4a4f66" class="fig-mono">y</text>
+
+    <!-- Ground and base -->
+    <line x1="36" y1={groundY} x2={W - 36} y2={groundY} stroke="#101030" stroke-width="1.5"></line>
+    <rect x="36" y={groundY + 1} width={W - 72} height="10" fill="url(#hatch)"></rect>
+    <rect x={base.x - 34} y={base.y} width="68" height="16" fill="#101030"></rect>
+
+    <!-- Construction lines -->
+    <g stroke="#4a4f66" stroke-width="1" stroke-dasharray="4 5" fill="none">
+      <line x1={base.x} y1={base.y} x2={base.x + 150} y2={base.y}></line>
+      <path d={`M ${f(j1)} L ${f(polar(j1, 70, angles[0]))}`}></path>
+      <path d={`M ${f(j2)} L ${f(polar(j2, 56, angles[1]))}`}></path>
+      <line x1={tip.x} y1={tip.y} x2={tip.x} y2={groundY}></line>
+    </g>
+
+    <!-- Joint angles -->
+    <g stroke="#17766a" stroke-width="1.6" fill="none">
+      <path d={arc(base, 62, 0, angles[0])}></path>
+      <path d={arc(j1, 40, angles[1], angles[0])}></path>
+      <path d={arc(j2, 34, angles[1], angles[2])}></path>
+    </g>
+    <g font-size="15" fill="#17766a" text-anchor="middle" dominant-baseline="middle" class="fig-math">
+      <text x={polar(base, 88, 36).x} y={polar(base, 88, 36).y}>θ₁</text>
+      <text x={polar(j1, 70, 58).x} y={polar(j1, 70, 58).y}>θ₂</text>
+      <text x={polar(j2, 60, 10).x} y={polar(j2, 60, 10).y}>θ₃</text>
+    </g>
+
+    <!-- Links -->
+    <g stroke="#101030" stroke-linecap="round" fill="none">
+      <line x1={j0.x} y1={j0.y} x2={j1.x} y2={j1.y} stroke-width="12"></line>
+      <line x1={j1.x} y1={j1.y} x2={j2.x} y2={j2.y} stroke-width="10"></line>
+      <line x1={j2.x} y1={j2.y} x2={tip.x} y2={tip.y} stroke-width="8"></line>
+    </g>
+
+    <!-- Gripper -->
+    <g stroke="#17766a" stroke-width="3" stroke-linecap="round" fill="none">
+      <line x1={g(9, 0).x} y1={g(9, 0).y} x2={g(9, 18).x} y2={g(9, 18).y}></line>
+      <line x1={g(-9, 0).x} y1={g(-9, 0).y} x2={g(-9, 18).x} y2={g(-9, 18).y}></line>
+    </g>
+
+    <!-- Joints -->
+    <circle cx={j0.x} cy={j0.y} r="6" fill="#101030"></circle>
+    <circle cx={j1.x} cy={j1.y} r="7" fill="#ffffff" stroke="#101030" stroke-width="2.5"></circle>
+    <circle cx={j2.x} cy={j2.y} r="7" fill="#ffffff" stroke="#101030" stroke-width="2.5"></circle>
+    <circle cx={tip.x} cy={tip.y} r="4" fill="#17766a"></circle>
+
+    <!-- Link lengths -->
+    <g font-size="15" fill="#4a4f66" text-anchor="middle" dominant-baseline="middle" class="fig-math">
+      <text x={beside(j0, j1, angles[0], 26).x} y={beside(j0, j1, angles[0], 26).y}>l₁</text>
+      <text x={beside(j1, j2, angles[1], 24).x} y={beside(j1, j2, angles[1], 24).y}>l₂</text>
+      <text x={beside(j2, tip, angles[2], 22).x} y={beside(j2, tip, angles[2], 22).y}>l₃</text>
+    </g>
+  </svg>
+</figure>

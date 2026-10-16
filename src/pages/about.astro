@@ -1,0 +1,98 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Timeline from '../components/Timeline.astro';
+import { site } from '../config/site';
+
+// Placeholder copy for the About page. Replace the text with the centre's own history, facilities and leadership.
+const milestones = [
+  { label: 'Year 1', title: 'Milestone 1', text: 'Placeholder text. Describe the first milestone in one or two sentences.' },
+  { label: 'Year 2', title: 'Milestone 2', text: 'Placeholder text. Describe the second milestone in one or two sentences.' },
+  { label: 'Year 3', title: 'Milestone 3', text: 'Placeholder text. Describe the third milestone in one or two sentences.' },
+  { label: 'Year 4', title: 'Milestone 4', text: 'Placeholder text. Describe the fourth milestone in one or two sentences.' },
+  { label: 'Year 5', title: 'Milestone 5', text: 'Placeholder text. Describe the fifth milestone in one or two sentences.' },
+  { label: 'Year 6', title: 'Milestone 6', text: 'Placeholder text. Describe the sixth milestone in one or two sentences.' },
+  { label: 'Year 7', title: 'Milestone 7', text: 'Placeholder text. Describe the seventh milestone in one or two sentences.' },
+];
+
+const facilities = [
+  { title: 'Facility 1', kind: 'Facility type', text: 'Placeholder description of the facility and what it is used for.' },
+  { title: 'Facility 2', kind: 'Facility type', text: 'Placeholder description of the facility and what it is used for.' },
+  { title: 'Facility 3', kind: 'Facility type', text: 'Placeholder description of the facility and what it is used for.' },
+  { title: 'Facility 4', kind: 'Facility type', text: 'Placeholder description of the facility and what it is used for.' },
+];
+---
+
+<Layout title="About" description="History, mission, facilities and leadership of the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="About the centre"
+    title="Placeholder headline for the about page"
+    lead="Placeholder introduction. Replace it with two or three sentences on the centre’s focus and history."
+  />
+
+  <!-- Mission -->
+  <section class="mx-auto grid w-full max-w-page gap-14 px-5 py-24 sm:px-8 md:grid-cols-[1fr_1.1fr] md:gap-20">
+    <div>
+      <p class="eyebrow">01 / Mission</p>
+      <h2 class="mt-4">Placeholder heading for the mission statement</h2>
+    </div>
+    <div class="space-y-6 text-lg leading-relaxed text-muted">
+      <p>Placeholder paragraph. Describe what the centre does for students, researchers and partners.</p>
+      <p>Placeholder paragraph. Describe the aims of the centre and the people it serves.</p>
+      <p>Placeholder paragraph. Describe the partnerships that support the centre.</p>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section class="bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="History" title="Placeholder heading for the history section" lead="Placeholder lead. Replace the milestones below with dated events from the centre’s records." />
+      <div class="mt-16">
+        <Timeline items={milestones} />
+      </div>
+    </div>
+  </section>
+
+  <!-- Facilities -->
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="Facilities" title="Laboratory infrastructure" lead="Placeholder lead for the facilities section." />
+    <div class="mt-16 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      {facilities.map((item) => (
+        <Card>
+          <p class="eyebrow">{item.kind}</p>
+          <h3 class="mt-4 text-[1.4rem]">{item.title}</h3>
+          <p class="mt-3 text-[0.95rem] leading-relaxed text-muted">{item.text}</p>
+        </Card>
+      ))}
+    </div>
+    <div class="mt-12">
+      <Button href="/gallery/" variant="link">See the laboratory in the gallery →</Button>
+    </div>
+  </section>
+
+  <!-- Leadership -->
+  <section class="bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="04" label="Leadership" title="Who leads the centre" />
+      <div class="mt-16 grid gap-12 md:grid-cols-2">
+        <div class="border-t-2 border-accent pt-6">
+          <p class="font-mono text-xs tracking-[0.12em] text-muted">Head</p>
+          <h3 class="mt-3 text-[1.5rem]">CIR Head</h3>
+          <p class="mt-2 text-muted">Placeholder description of the head’s role in the centre.</p>
+        </div>
+        <div class="border-t-2 border-line pt-6">
+          <p class="font-mono text-xs tracking-[0.12em] text-muted">Founder</p>
+          <h3 class="mt-3 text-[1.5rem]">Professor 1</h3>
+          <p class="mt-2 text-muted">Placeholder description of a founding member’s contribution.</p>
+        </div>
+      </div>
+      <div class="mt-12 flex flex-wrap gap-x-8 gap-y-4">
+        <Button href="/people/" variant="outline">Meet the people</Button>
+        <Button href={`mailto:${site.email}`} variant="link">Write to the centre →</Button>
+      </div>
+    </div>
+  </section>
+</Layout>

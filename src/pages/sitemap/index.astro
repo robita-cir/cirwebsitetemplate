@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { footerGroups, nav } from '../../config/site';
+import { byOrder } from '../../lib/format';
+
+const [people, areas, projects, news, events, albums, documents] = await Promise.all([
+  getCollection('people'),
+  getCollection('research'),
+  getCollection('projects'),
+  getCollection('news'),
+  getCollection('events'),
+  getCollection('gallery'),
+  getCollection('documents'),
+]);
+
+const groupTitles: Record<string, string> = {
+  faculty: 'Faculty',
+  scholar: 'Research scholars',
+  mtech: 'M.Tech students',
+  'alumni-research': 'Research alumni',
+  'alumni-mtech': 'M.Tech alumni',
+  'alumni-btech': 'B.Tech alumni',
+};
+
+const peopleGroups = Object.keys(groupTitles).map((group) => ({
+  title: groupTitles[group],
+  items: people.filter((person) => person.data.group === group).sort(byOrder),
+}));
+
+const newsSorted = [...news].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const eventsSorted = [...events].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Layout title="Site map" description="Every page on the Centre for Intelligent Robotics website, in one list.">
+  <PageHero eyebrow="Site map" title="Every page on this site" lead="The main sections, then every person, project, article, event and album that has its own page." />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Main sections" title="Main pages" />
+    <ul class="mt-12 grid gap-x-10 gap-y-3 border-t border-line pt-8 sm:grid-cols-2 lg:grid-cols-3">
+      <li><a class="text-accent underline-offset-4 hover:underline" href="/">Home</a></li>
+      {nav.map((item) => (
+        <li><a class="text-accent underline-offset-4 hover:underline" href={item.href}>{item.label}</a></li>
+      ))}
+      <li><a class="text-accent underline-offset-4 hover:underline" href="/facilities/">Facilities</a></li>
+      <li><a class="text-accent underline-offset-4 hover:underline" href="/publications/">Publications</a></li>
+      <li><a class="text-accent underline-offset-4 hover:underline" href="/documents/">Documents</a></li>
+      <li><a class="text-accent underline-offset-4 hover:underline" href="/gallery/">Gallery</a></li>
+      <li><a class="text-accent underline-offset-4 hover:underline" href="/support/">Support the centre</a></li>
+      <li><a class="text-accent underline-offset-4 hover:underline" href="/search/">Search</a></li>
+    </ul>
+  </section>
+
+  <section class="bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Research" title="Research directions and projects" />
+      <div class="mt-12 grid gap-12 lg:grid-cols-2">
+        <div>
+          <h3 class="text-[1.2rem]">Research directions</h3>
+          <ul class="mt-4 space-y-2 text-sm">
+            {areas.sort(byOrder).map((area) => (
+              <li><a class="text-accent underline-offset-4 hover:underline" href={`/research/${area.id}/`}>{area.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-[1.2rem]">Student projects</h3>
+          <ul class="mt-4 space-y-2 text-sm">
+            {projects.sort(byOrder).map((project) => (
+              <li><a class="text-accent underline-offset-4 hover:underline" href={`/research/projects/${project.id}/`}>{project.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="People" title="People" />
+    <div class="mt-12 grid gap-12 md:grid-cols-2 xl:grid-cols-3">
+      {peopleGroups.filter((group) => group.items.length > 0).map((group) => (
+        <div>
+          <h3 class="text-[1.2rem]">{group.title}</h3>
+          <ul class="mt-4 space-y-2 text-sm">
+            {group.items.map((person) => (
+              <li><a class="text-accent underline-offset-4 hover:underline" href={`/people/${person.id}/`}>{person.data.name}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="04" label="News and events" title="News, events and albums" />
+      <div class="mt-12 grid gap-12 lg:grid-cols-3">
+        <div>
+          <h3 class="text-[1.2rem]">News</h3>
+          <ul class="mt-4 space-y-2 text-sm">
+            {newsSorted.map((article) => (
+              <li><a class="text-accent underline-offset-4 hover:underline" href={`/news/${article.id}/`}>{article.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-[1.2rem]">Events</h3>
+          <ul class="mt-4 space-y-2 text-sm">
+            {eventsSorted.map((event) => (
+              <li><a class="text-accent underline-offset-4 hover:underline" href={`/events/${event.id}/`}>{event.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-[1.2rem]">Gallery albums</h3>
+          <ul class="mt-4 space-y-2 text-sm">
+            {albums.sort(byOrder).map((album) => (
+              <li><a class="text-accent underline-offset-4 hover:underline" href={`/gallery/${album.id}/`}>{album.data.title}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="05" label="This site" title="Footer and legal pages" />
+    <div class="mt-12 grid gap-12 md:grid-cols-2 xl:grid-cols-5">
+      {footerGroups.map((group) => (
+        <div>
+          <h3 class="text-[1.1rem]">{group.title}</h3>
+          <ul class="mt-4 space-y-2 text-sm">
+            {group.links.map((link) => (
+              <li><a class="text-accent underline-offset-4 hover:underline" href={link.href}>{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    <p class="mt-12 text-sm text-muted">Documents available for download: {documents.length} listed on the <a class="text-accent underline underline-offset-4" href="/documents/">documents page</a>.</p>
+  </section>
+</Layout>

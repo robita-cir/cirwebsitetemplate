@@ -1,0 +1,108 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import EmptyState from '../components/EmptyState.astro';
+import EventCard from '../components/EventCard.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import SubNav from '../components/SubNav.astro';
+import { site } from '../config/site';
+import { isoDate, kindLabel, yearOf } from '../lib/format';
+
+const events = (await getCollection('events')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Upcoming: events that have not finished at build time, soonest first. The site is rebuilt to update this list.
+const now = Date.now();
+const upcoming = events
+  .filter((event) => (event.data.endDate ?? event.data.date).getTime() >= now)
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+
+const series = events.filter((event) => event.data.series === 'series-1');
+
+// Archive: events grouped by the year they start, newest year first.
+const years = [...new Set(events.map((event) => yearOf(event.data.date)))];
+const byYear = years.map((year) => ({
+  year,
+  items: events.filter((event) => yearOf(event.data.date) === year),
+}));
+
+const subNav = [
+  { href: '#upcoming', label: 'Upcoming' },
+  { href: '#series', label: 'Workshop series' },
+  { href: '#archive', label: 'Archive' },
+];
+
+const cardProps = (event: (typeof events)[number]) => ({
+  title: event.data.title,
+  date: isoDate(event.data.date),
+  endDate: event.data.endDate ? isoDate(event.data.endDate) : undefined,
+  venue: event.data.venue,
+  type: kindLabel[event.data.kind],
+  summary: event.data.summary,
+  href: `/events/${event.id}/`,
+  sample: event.data.sample,
+});
+---
+
+<Layout title="Events" description="Workshops, training programmes and talks held by the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Events"
+    title="Workshops, training and talks"
+    lead="The centre runs international workshops, professional training and talks by alumni working in industry. Upcoming events appear here first."
+  />
+  <SubNav label="On this page" items={subNav} />
+
+  <!-- Upcoming -->
+  <section id="upcoming" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Upcoming" title="What is coming up" />
+    {
+      upcoming.length > 0 ? (
+        <div class="mt-14 grid gap-6 md:grid-cols-2">
+          {upcoming.map((event) => <EventCard {...cardProps(event)} />)}
+        </div>
+      ) : (
+        <div class="mt-14">
+          <EmptyState title="No upcoming events are announced yet">
+            Workshops, training programmes and talks will be listed here as they are scheduled. To be told first, write to the centre at {site.email}.
+          </EmptyState>
+        </div>
+      )
+    }
+    <div class="mt-10">
+      <Button href={`mailto:${site.email}`} variant="link">Ask to be notified →</Button>
+    </div>
+  </section>
+
+  <!-- Series -->
+  <section id="series" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Workshop series" title="Placeholder title for the workshop series" lead="Placeholder lead. Describe the series, its editions and the audience it is for." />
+      <div class="mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {series.map((event) => <EventCard {...cardProps(event)} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Archive -->
+  <section id="archive" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="Archive" title="All events, by year" lead="Every workshop, training programme and talk listed on the centre’s records." />
+    <div class="mt-16 space-y-20">
+      {
+        byYear.map((group) => (
+          <div>
+            <div class="flex items-baseline justify-between gap-6 border-b-2 border-accent pb-4">
+              <h3 class="text-[1.6rem]">{group.year}</h3>
+              <p class="font-mono text-xs uppercase tracking-[0.1em] text-muted">
+                {group.items.length} {group.items.length === 1 ? 'event' : 'events'}
+              </p>
+            </div>
+            <div class="mt-8 grid gap-6 md:grid-cols-2">
+              {group.items.map((event) => <EventCard {...cardProps(event)} />)}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</Layout>

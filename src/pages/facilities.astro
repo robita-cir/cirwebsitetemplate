@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+import EmptyState from '../components/EmptyState.astro';
+import PageHero from '../components/PageHero.astro';
+import SampleTag from '../components/SampleTag.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { site } from '../config/site';
+import { byOrder } from '../lib/format';
+
+const facilities = (await getCollection('facilities')).sort(byOrder);
+---
+
+<Layout title="Facilities" description="Laboratory equipment and facilities of the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Facilities"
+    title="Laboratory and equipment"
+    lead="The centre's robots and laboratory equipment, used for research, teaching and prototyping."
+  />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Equipment" title="Robots and platforms" lead="Commercial platforms and robots built in the centre. Photographs and specifications will be added as they are supplied." />
+    <div class="mt-16 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      {
+        facilities.map((item) => (
+          <Card>
+            <div class="flex items-start justify-between gap-3">
+              <p class="eyebrow">{item.data.kind}</p>
+              {item.data.sample && <SampleTag />}
+            </div>
+            <h3 class="mt-4 text-[1.4rem] leading-snug">{item.data.name}</h3>
+            <p class="mt-3 text-[0.95rem] leading-relaxed text-muted">{item.data.summary}</p>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Spaces" title="Laboratory spaces" lead="Room-by-room description, capacity and booking route for the laboratory spaces." />
+      <div class="mt-14">
+        <EmptyState title="Laboratory spaces to be described">
+          Each laboratory space can have its own page with floor, capacity, the equipment it holds, and who to contact. Add them once the centre confirms the list.
+        </EmptyState>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto grid w-full max-w-page gap-10 px-5 py-24 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
+    <div>
+      <h2 class="max-w-xl text-[2rem]">Visit the laboratory</h2>
+      <p class="mt-5 max-w-xl text-lg leading-relaxed text-muted">
+        To arrange a visit for a class, a school group or a partner, write to the centre with the date and the number of visitors.
+      </p>
+    </div>
+    <Button href={`mailto:${site.email}?subject=Laboratory%20visit`} variant="primary">Request a visit</Button>
+  </section>
+</Layout>

@@ -1,0 +1,176 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+import EmptyState from '../components/EmptyState.astro';
+import PageHero from '../components/PageHero.astro';
+import SampleTag from '../components/SampleTag.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import SubNav from '../components/SubNav.astro';
+import { site } from '../config/site';
+import { byOrder, longDate } from '../lib/format';
+
+const typeNames: Record<string, string> = {
+  phd: 'Doctoral (PhD)',
+  mtech: 'M.Tech',
+  'research-assistant': 'Research assistant',
+  internship: 'Internship',
+  faculty: 'Faculty',
+  staff: 'Staff',
+  other: 'Other',
+};
+
+const openings = (await getCollection('openings')).sort((a, b) => {
+  if (a.data.status !== b.data.status) return a.data.status === 'open' ? -1 : 1;
+  return byOrder(a, b);
+});
+
+const ways = [
+  {
+    title: 'Postgraduate study',
+    text: 'M.Tech and doctoral (PhD) students work on funded and centre projects, supervised by faculty.',
+  },
+  {
+    title: 'Research internships',
+    text: 'Summer and project internships in robotics and AI. Eligibility and dates are given in each listing.',
+  },
+  {
+    title: 'Industry training and projects',
+    text: 'Professional training, pilot projects and joint research with companies and industry partners.',
+  },
+  {
+    title: 'Alumni and visitors',
+    text: 'Former members stay in touch through the alumni list. Visiting researchers and guest speakers are welcome by arrangement.',
+  },
+];
+
+const steps = [
+  { title: 'Read the position', text: 'Check the eligibility, the research direction and the deadline in the listing.' },
+  { title: 'Contact the supervisor', text: 'Write briefly about your background and why the project suits you. Attach your CV.' },
+  { title: 'Submit the application', text: 'Send the application to the address in the listing, before the deadline.' },
+  { title: 'Interview and decision', text: 'Shortlisted candidates are contacted for an interview. Decisions are sent by email.' },
+];
+
+const faqs = [
+  { question: 'Do I need a robotics background?', answer: 'Sample answer. State the entry requirements for each programme, such as the degrees and skills expected.' },
+  { question: 'Can undergraduates apply for internships?', answer: 'Sample answer. Say which years and programmes are eligible, and whether applications come from other institutions.' },
+  { question: 'Is funding available?', answer: 'Sample answer. Describe the funding routes for each position, and say where the details are posted.' },
+  { question: 'How long does an application take to process?', answer: 'Sample answer. Give a typical timeline from submission to decision.' },
+];
+
+const subNav = [
+  { href: '#ways', label: 'Ways to join' },
+  { href: '#openings', label: 'Open positions' },
+  { href: '#apply', label: 'How to apply' },
+  { href: '#questions', label: 'Questions' },
+];
+---
+
+<Layout title="Join" description="Study, research, intern or work with the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Join"
+    title="Study, research and work with the centre"
+    lead="Postgraduate study, research internships, industry training and open positions. Find the route that fits you, then contact the centre."
+  />
+  <SubNav label="On this page" items={subNav} />
+
+  <section id="ways" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Ways to join" title="Four routes into the centre" />
+    <div class="mt-16 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+      {
+        ways.map((way) => (
+          <Card>
+            <h3 class="text-[1.3rem]">{way.title}</h3>
+            <p class="mt-3 text-[0.95rem] leading-relaxed text-muted">{way.text}</p>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+
+  <section id="openings" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Open positions" title="Current openings" lead="Closed calls stay listed for reference. Check the deadline before you apply." />
+      <div class="mt-14">
+        {
+          openings.length > 0 ? (
+            <ul class="border-t border-line">
+              {openings.map((opening) => (
+                <li class="grid gap-4 border-b border-line py-7 md:grid-cols-[9rem_1fr_auto] md:items-center md:gap-10" data-reveal>
+                  <div>
+                    <p class="font-mono text-xs uppercase tracking-[0.12em] text-accent">{typeNames[opening.data.type]}</p>
+                    <p class:list={['mt-2 font-mono text-[0.68rem] uppercase tracking-[0.12em]', opening.data.status === 'open' ? 'text-ink' : 'text-muted']}>
+                      {opening.data.status === 'open' ? 'Open' : 'Closed'}
+                    </p>
+                  </div>
+                  <div class="min-w-0">
+                    {opening.data.sample && <div class="mb-2"><SampleTag /></div>}
+                    <h3 class="text-[1.25rem] leading-snug">{opening.data.title}</h3>
+                    <p class="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{opening.data.summary}</p>
+                    {opening.data.deadline && (
+                      <p class="mt-2 font-mono text-xs uppercase tracking-[0.1em] text-muted">Deadline {longDate(opening.data.deadline)}</p>
+                    )}
+                  </div>
+                  <div>
+                    {opening.data.status === 'open' ? (
+                      <Button href={`mailto:${opening.data.applyEmail ?? site.email}?subject=${encodeURIComponent(opening.data.title)}`} variant="outline">
+                        Apply by email
+                      </Button>
+                    ) : (
+                      <span class="text-sm text-muted">Applications closed</span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyState title="No positions are open at the moment">
+              Openings for students, research assistants and staff are posted here. To be notified, write to the centre.
+            </EmptyState>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="apply" class="scroll-mt-40 mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="How to apply" title="Four steps" />
+    <ol class="mt-16 grid gap-10 md:grid-cols-2 xl:grid-cols-4">
+      {
+        steps.map((step, index) => (
+          <li class="border-t-2 border-accent pt-6">
+            <p class="font-mono text-xs text-accent">{String(index + 1).padStart(2, '0')}</p>
+            <h3 class="mt-4 text-[1.3rem]">{step.title}</h3>
+            <p class="mt-3 leading-relaxed text-muted">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section id="questions" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="04" label="Questions" title="Frequently asked" lead="Answers to the questions we are asked most often. Sample answers are marked and will be replaced." />
+      <div class="mt-14 divide-y divide-line border-y border-line">
+        {
+          faqs.map((faq) => (
+            <details class="group py-6">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-[1.15rem] font-display text-ink [&::-webkit-details-marker]:hidden">
+                <span>{faq.question}</span>
+                <span aria-hidden="true" class="font-mono text-lg text-accent transition-transform duration-300 group-open:rotate-45">+</span>
+              </summary>
+              <div class="mt-4 max-w-2xl space-y-3">
+                <SampleTag />
+                <p class="leading-relaxed text-muted">{faq.answer}</p>
+              </div>
+            </details>
+          ))
+        }
+      </div>
+      <div class="mt-12">
+        <Button href={`mailto:${site.email}?subject=Question%20about%20joining`} variant="primary">Ask a question</Button>
+      </div>
+    </div>
+  </section>
+</Layout>

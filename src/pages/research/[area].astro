@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Button from '../../components/Button.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProjectRow from '../../components/ProjectRow.astro';
+import PublicationItem from '../../components/PublicationItem.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { byOrder } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const areas = await getCollection('research');
+  return areas.map((entry) => ({ params: { area: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+
+const projects = (await getCollection('projects'))
+  .filter((project) => project.data.area === entry.id)
+  .sort(byOrder);
+
+const publications = (await getCollection('publications'))
+  .filter((publication) => publication.data.area === entry.id)
+  .sort((a, b) => b.data.year - a.data.year);
+
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Research', href: '/research/' },
+  { label: entry.data.title },
+];
+---
+
+<Layout title={entry.data.title} description={entry.data.description}>
+  <PageHero eyebrow={`Research direction ${entry.data.code}`} title={entry.data.title} lead={entry.data.description} crumbs={crumbs} />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Projects" title="Student projects in this direction" />
+    <div class="mt-14">
+      {
+        projects.length > 0 ? (
+          <ul class="border-b border-line">
+            {projects.map((project) => (
+              <ProjectRow
+                title={project.data.title}
+                team={project.data.students.join(', ')}
+                status={project.data.status}
+                href={`/research/projects/${project.id}/`}
+                sample={project.data.sample}
+              />
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No projects are listed in this direction yet">
+            Projects are added to the research list as they are approved. Contact the centre if you would like to propose one.
+          </EmptyState>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Publications" title="Publications in this direction" />
+      <div class="mt-14">
+        {
+          publications.length > 0 ? (
+            <ul class="border-b border-line">
+              {publications.map((publication) => (
+                <PublicationItem
+                  title={publication.data.title}
+                  authors={publication.data.authors}
+                  venue={publication.data.venue}
+                  year={publication.data.year}
+                  type={publication.data.type}
+                  doi={publication.data.doi}
+                  url={publication.data.url}
+                  sample={publication.data.sample}
+                />
+              ))}
+            </ul>
+          ) : (
+            <EmptyState title="No publications are listed in this direction yet">
+              Publications will be listed here, with DOI links, once the centre supplies them.
+            </EmptyState>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto w-full max-w-page px-5 py-16 sm:px-8">
+    <Button href="/research/" variant="link">← All research directions</Button>
+  </section>
+</Layout>

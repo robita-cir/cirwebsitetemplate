@@ -1,0 +1,30 @@
+---
+// Breadcrumb trail for detail pages. The last item is the current page and is not linked.
+interface Item {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" data-print-hide class="text-[0.78rem] text-muted">
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
+    {
+      items.map((item, index) => (
+        <li class="flex min-w-0 max-w-full items-center gap-2">
+          {item.href ? (
+            <a href={item.href} class="transition-colors hover:text-ink hover:underline underline-offset-4">{item.label}</a>
+          ) : (
+            <span aria-current="page" class="text-ink">{item.label}</span>
+          )}
+          {index < items.length - 1 && <span aria-hidden="true" class="text-line">/</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

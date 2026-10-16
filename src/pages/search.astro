@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+---
+
+<Layout title="Search" description="Search the Centre for Intelligent Robotics website." noindex>
+  <PageHero
+    eyebrow="Search"
+    title="Search the site"
+    lead="Find people, projects, publications, events, news and documents. Search runs in your browser, so the page works without sending your search anywhere."
+  />
+
+  <section class="mx-auto w-full max-w-page px-5 py-16 sm:px-8" data-pagefind-ignore>
+    <!-- Pagefind writes its interface and index at build time (npm run build). -->
+    <div id="search" class="search-ui">
+      <noscript>
+        <p class="text-muted">Search needs JavaScript. You can also use the site map to find pages.</p>
+      </noscript>
+      <p id="search-status" class="text-muted" role="status">Loading search…</p>
+    </div>
+  </section>
+
+  <script is:inline src="/pagefind/pagefind-ui.js"></script>
+  <script is:inline>
+    (function () {
+      var status = document.getElementById('search-status');
+      function start() {
+        if (typeof PagefindUI === 'undefined') {
+          status.textContent =
+            'Search is not available in this preview. It is built with the site (npm run build) and works on the built site.';
+          return;
+        }
+        status.remove();
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = '/pagefind/pagefind-ui.css';
+        document.head.appendChild(css);
+        new PagefindUI({ element: '#search', showImages: false, translations: { placeholder: 'Search people, projects, news and more' } });
+        // The search box has a placeholder but no visible label, so give it an accessible name.
+        var input = document.querySelector('#search input');
+        if (input) input.setAttribute('aria-label', 'Search the site');
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+      } else {
+        start();
+      }
+    })();
+  </script>
+
+  <style is:global>
+    /* Pagefind's interface, set to the site's tokens. */
+    .search-ui {
+      --pagefind-ui-primary: #17766a;
+      --pagefind-ui-text: #101030;
+      --pagefind-ui-background: #ffffff;
+      --pagefind-ui-border: #d9dce3;
+      --pagefind-ui-tag: #f6f7f9;
+      --pagefind-ui-border-width: 1px;
+      --pagefind-ui-border-radius: 0px;
+      --pagefind-ui-font: "Inter Variable", Inter, system-ui, sans-serif;
+    }
+  </style>
+</Layout>

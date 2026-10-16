@@ -1,0 +1,38 @@
+---
+import SampleTag from './SampleTag.astro';
+
+interface Props {
+  // ISO date (YYYY-MM-DD)
+  date: string;
+  title: string;
+  href?: string;
+  kind?: string;
+  sample?: boolean;
+}
+
+const { date, title, href, kind, sample = false } = Astro.props;
+
+const label = new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', {
+  timeZone: 'UTC',
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+
+<li class="grid gap-3 border-t border-line py-7 md:grid-cols-[10rem_1fr_auto] md:items-baseline md:gap-10" data-reveal>
+  <time datetime={date} class="font-mono text-xs uppercase tracking-[0.12em] text-muted">{label}</time>
+  <div class="min-w-0">
+    {sample && <div class="mb-2"><SampleTag /></div>}
+    {
+      href ? (
+        <a href={href} class="font-display text-[1.3rem] leading-snug text-ink underline-offset-4 transition-colors hover:text-accent hover:underline">
+          {title}
+        </a>
+      ) : (
+        <p class="font-display text-[1.3rem] leading-snug text-ink">{title}</p>
+      )
+    }
+  </div>
+  {kind && <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-accent">{kind}</span>}
+</li>

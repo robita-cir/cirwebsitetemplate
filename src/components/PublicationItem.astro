@@ -1,0 +1,42 @@
+---
+import SampleTag from './SampleTag.astro';
+
+interface Props {
+  title: string;
+  authors: string[];
+  venue: string;
+  year: number;
+  type: string;
+  doi?: string;
+  url?: string;
+  sample?: boolean;
+}
+
+const { title, authors, venue, year, type, doi, url, sample = false } = Astro.props;
+const doiHref = doi ? `https://doi.org/${doi}` : undefined;
+---
+
+<li class="grid gap-3 border-t border-line py-7 md:grid-cols-[6rem_1fr] md:gap-10" data-reveal>
+  <div class="font-mono text-xs uppercase tracking-[0.12em] text-muted">
+    <p>{year}</p>
+    <p class="mt-1 text-accent">{type}</p>
+  </div>
+  <div class="min-w-0">
+    {sample && <div class="mb-2"><SampleTag /></div>}
+    <p class="font-display text-[1.25rem] leading-snug text-ink">{title}</p>
+    <p class="mt-2 text-sm text-muted">{authors.join(', ')}</p>
+    <p class="mt-1 text-sm italic text-muted">{venue}</p>
+    {
+      (doiHref || url) && (
+        <p class="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+          {doiHref && (
+            <a href={doiHref} class="break-all text-accent underline-offset-4 hover:underline">DOI {doi}</a>
+          )}
+          {url && !doiHref && (
+            <a href={url} class="break-all text-accent underline-offset-4 hover:underline">Link</a>
+          )}
+        </p>
+      )
+    }
+  </div>
+</li>

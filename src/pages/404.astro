@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import { nav } from '../config/site';
+---
+
+<Layout title="Page not found" noindex>
+  <section class="mx-auto flex min-h-[60vh] w-full max-w-page flex-col justify-center px-5 py-24 sm:px-8">
+    <p class="eyebrow">Error 404</p>
+    <h1 class="mt-6 max-w-[18ch]">This page is not here.</h1>
+    <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+      The address may have changed, or the page may not be published yet. The main sections of the site are below.
+    </p>
+    <ul class="mt-10 flex flex-wrap gap-x-8 gap-y-4">
+      {nav.map((item) => <li><a href={item.href} class="text-accent underline-offset-4 hover:underline">{item.label}</a></li>)}
+    </ul>
+    <div class="mt-12">
+      <Button href="/" variant="outline">Back to the homepage</Button>
+    </div>
+  </section>
+</Layout>

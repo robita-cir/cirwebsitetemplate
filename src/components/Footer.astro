@@ -1,0 +1,55 @@
+---
+import { footerGroups, robita, site } from '../config/site';
+
+const year = new Date().getFullYear();
+const phoneHref = `tel:${site.phone.replace(/\s/g, '')}`;
+---
+
+<footer class="border-t border-line bg-band">
+  <div class="mx-auto grid w-full max-w-page gap-12 px-5 py-16 sm:px-8 md:grid-cols-2">
+    <div>
+      <p class="font-display text-2xl font-medium leading-snug text-ink">{site.name}</p>
+      <p class="mt-2 text-sm text-muted">{site.institute}</p>
+      <p class="mt-6 max-w-sm text-sm leading-relaxed text-muted">
+        Research, training and product development in intelligent robotics, from perception and manipulation to assistive systems.
+      </p>
+      <p class="mt-6 text-sm">
+        <a href={robita.url} class="font-medium text-accent hover:underline">{robita.label} ↗</a>
+      </p>
+    </div>
+
+    <div class="text-sm">
+      <p class="eyebrow">Contact</p>
+      <address class="mt-5 space-y-1 leading-relaxed text-muted not-italic">
+        {site.address.map((line) => (<span class="block">{line}</span>))}
+        <a class="mt-4 block break-all text-accent hover:underline" href={`mailto:${site.email}`}>{site.email}</a>
+        <a class="block text-accent hover:underline" href={phoneHref}><span set:html={site.phoneHtml} /></a>
+      </address>
+    </div>
+  </div>
+
+  <nav aria-label="Footer" class="border-t border-line">
+    <div class="mx-auto grid w-full max-w-page gap-10 px-5 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-5">
+      {
+        footerGroups.map((group) => (
+          <div>
+            <p class="eyebrow">{group.title}</p>
+            <ul class="mt-5 space-y-2.5 text-sm">
+              {group.links.map((link) => (
+                <li>
+                  <a class="text-muted transition-colors hover:text-ink" href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </nav>
+
+  <div class="border-t border-line">
+    <p class="mx-auto w-full max-w-page px-5 py-5 text-xs text-muted sm:px-8">
+      © {year} {site.name}, {site.institute}.
+    </p>
+  </div>
+</footer>

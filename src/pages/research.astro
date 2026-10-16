@@ -1,0 +1,223 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import EmptyState from '../components/EmptyState.astro';
+import PageHero from '../components/PageHero.astro';
+import ProjectRow from '../components/ProjectRow.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import ResearchArea from '../components/ResearchArea.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import SubNav from '../components/SubNav.astro';
+import { byOrder } from '../lib/format';
+
+const [areas, projects, funding, publications] = await Promise.all([
+  getCollection('research'),
+  getCollection('projects'),
+  getCollection('funding'),
+  getCollection('publications'),
+]);
+
+const sortedAreas = [...areas].sort(byOrder);
+const projectsIn = (area: string) => projects.filter((project) => project.data.area === area).sort(byOrder);
+
+// Group order: the four research areas, then anything filed under "other".
+const groups = [
+  ...sortedAreas.map((area) => ({ id: area.id, code: area.data.code, title: area.data.title, items: projectsIn(area.id) })),
+  { id: 'other', code: '', title: 'Other projects', items: projectsIn('other') },
+].filter((group) => group.items.length > 0);
+
+const sortedFunding = [...funding].sort(byOrder);
+
+const latestPublications = [...publications]
+  .sort((a, b) => (b.data.year !== a.data.year ? b.data.year - a.data.year : a.data.title.localeCompare(b.data.title)))
+  .slice(0, 4);
+
+const subNav = [
+  { href: '#directions', label: 'Directions' },
+  { href: '#funding', label: 'Funding' },
+  { href: '#featured', label: 'Featured programme' },
+  { href: '#projects', label: 'Projects' },
+  { href: '#publications', label: 'Publications' },
+];
+
+// Placeholder consortium and outcomes for the featured programme. Replace them with the programme's own lists.
+const consortium = ['Partner 1 (lead)', 'Partner 2', 'Partner 3', 'Partner 4', 'Partner 5', 'Partner 6'];
+
+const outcomes = [
+  'Placeholder outcome 1. Replace with a target from the programme description.',
+  'Placeholder outcome 2. Replace with a target from the programme description.',
+  'Placeholder outcome 3. Replace with a target from the programme description.',
+  'Placeholder outcome 4. Replace with a target from the programme description.',
+  'Placeholder outcome 5. Replace with a target from the programme description.',
+  'Placeholder outcome 6. Replace with a target from the programme description.',
+  'Placeholder outcome 7. Replace with a target from the programme description.',
+  'Placeholder outcome 8. Replace with a target from the programme description.',
+];
+---
+
+<Layout title="Research" description="Research directions, funded programmes, student projects and publications of the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Research"
+    title="Research directions, funded programmes and student projects"
+    lead="Placeholder introduction. Replace it with a short summary of the centre’s research directions and partners."
+  />
+  <SubNav label="On this page" items={subNav} />
+
+  <!-- Directions -->
+  <section id="directions" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Directions" title="Four research directions" lead="Each direction groups the centre's student projects by topic." />
+    <div class="mt-16 grid gap-12 md:grid-cols-2 xl:grid-cols-4 xl:gap-8">
+      {
+        sortedAreas.map((area) => (
+          <ResearchArea
+            code={area.data.code}
+            title={area.data.title}
+            description={area.data.description}
+            examples={projectsIn(area.id).slice(0, 3).map((project) => project.data.title)}
+            href={`/research/${area.id}/`}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Funding -->
+  <section id="funding" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Funding" title="Externally funded programmes" lead="Placeholder lead for the funded programmes." />
+      <ul class="mt-14 border-t border-line">
+        {
+          sortedFunding.map((item) => (
+            <li class="grid gap-3 border-b border-line py-7 md:grid-cols-[1.4fr_1fr_auto] md:items-baseline md:gap-10">
+              <div>
+                <h3 class="text-[1.3rem]">{item.data.title}</h3>
+                {item.data.summary && <p class="mt-2 text-sm leading-relaxed text-muted">{item.data.summary}</p>}
+              </div>
+              <div class="text-sm leading-relaxed">
+                <p class="text-ink">{item.data.funder}</p>
+                {item.data.partner && <p class="text-muted">{item.data.partner}</p>}
+              </div>
+              <div class="text-sm md:text-right">
+                {item.data.amount && <p class="font-medium text-ink">{item.data.amount}</p>}
+                {item.data.period && <p class="font-mono text-xs uppercase tracking-[0.1em] text-muted">{item.data.period}</p>}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Featured programme -->
+  <section id="featured" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="Featured programme" title="Placeholder programme name" lead="Placeholder lead. Describe the programme, who leads it and who funds it." />
+    <div class="mt-16 grid gap-14 lg:grid-cols-[1fr_1.1fr]">
+      <div class="space-y-8">
+        <p class="text-lg leading-relaxed text-muted">
+          Placeholder paragraph. Describe the aims of the featured programme and what the centre contributes to it.
+        </p>
+        <dl class="grid grid-cols-[auto_1fr] gap-x-8 gap-y-4 border-t border-line pt-6 text-sm">
+          <dt class="font-mono text-xs uppercase tracking-[0.1em] text-muted">Project number</dt>
+          <dd class="text-ink">000000</dd>
+          <dt class="font-mono text-xs uppercase tracking-[0.1em] text-muted">Funder</dt>
+          <dd class="text-ink">Funder name</dd>
+          <dt class="font-mono text-xs uppercase tracking-[0.1em] text-muted">Period</dt>
+          <dd class="text-ink">Start year to end year</dd>
+          <dt class="font-mono text-xs uppercase tracking-[0.1em] text-muted">Budget</dt>
+          <dd class="text-ink">Amount placeholder</dd>
+          <dt class="font-mono text-xs uppercase tracking-[0.1em] text-muted">Partners</dt>
+          <dd class="text-ink">Number of partners</dd>
+        </dl>
+        <div>
+          <h3 class="text-[1.2rem]">Consortium</h3>
+          <ul class="mt-4 grid gap-x-8 gap-y-2 text-sm text-muted sm:grid-cols-2">
+            {consortium.map((partner) => <li class="border-b border-line py-2">{partner}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t-2 border-accent pt-6">
+        <h3 class="text-[1.5rem]">Planned outcomes</h3>
+        <p class="mt-3 text-sm text-muted">Placeholder targets. Replace them with the outcomes stated in the programme description.</p>
+        <ol class="mt-6 divide-y divide-line">
+          {
+            outcomes.map((outcome, index) => (
+              <li class="grid grid-cols-[2.5rem_1fr] gap-3 py-4 text-[0.98rem] leading-relaxed text-ink">
+                <span class="font-mono text-xs text-accent">{String(index + 1).padStart(2, '0')}</span>
+                <span>{outcome}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="04" label="Projects" title="Student research projects" lead={`${projects.length} projects, grouped by research direction. Each project has its own page.`} />
+      <div class="mt-16 space-y-20">
+        {
+          groups.map((group) => (
+            <div>
+              <div class="flex items-baseline justify-between gap-6 border-b-2 border-accent pb-4">
+                <h3 class="text-[1.6rem]">
+                  {group.code && <span class="mr-3 font-mono text-sm text-accent">{group.code}</span>}
+                  {group.title}
+                </h3>
+                <p class="font-mono text-xs uppercase tracking-[0.1em] text-muted">{group.items.length} {group.items.length === 1 ? 'project' : 'projects'}</p>
+              </div>
+              <ul class="border-b border-line">
+                {
+                  group.items.map((project) => (
+                    <ProjectRow
+                      title={project.data.title}
+                      team={project.data.students.join(', ')}
+                      status={project.data.status}
+                      href={`/research/projects/${project.id}/`}
+                      sample={project.data.sample}
+                    />
+                  ))
+                }
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Publications -->
+  <section id="publications" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="05" label="Publications" title="Recent publications" lead="The latest entries. The full list, by year, is on the publications page." />
+    <div class="mt-14">
+      {
+        latestPublications.length > 0 ? (
+          <ul class="border-b border-line">
+            {latestPublications.map((publication) => (
+              <PublicationItem
+                title={publication.data.title}
+                authors={publication.data.authors}
+                venue={publication.data.venue}
+                year={publication.data.year}
+                type={publication.data.type}
+                doi={publication.data.doi}
+                url={publication.data.url}
+                sample={publication.data.sample}
+              />
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="The publication list is being compiled">
+            Journal and conference papers from the centre will be listed here, with links to DOIs where available.
+          </EmptyState>
+        )
+      }
+    </div>
+    <div class="mt-12 flex flex-wrap gap-x-8 gap-y-4">
+      <Button href="/publications/" variant="outline">All publications</Button>
+    </div>
+  </section>
+</Layout>

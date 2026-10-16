@@ -1,0 +1,57 @@
+---
+import Badge from './Badge.astro';
+import Card from './Card.astro';
+import SampleTag from './SampleTag.astro';
+
+interface Props {
+  title: string;
+  // ISO dates (YYYY-MM-DD). Formatted in UTC so the day never shifts between servers and browsers.
+  date: string;
+  endDate?: string;
+  venue?: string;
+  type?: string;
+  summary?: string;
+  href?: string;
+  sample?: boolean;
+}
+
+const { title, date, endDate, venue, type, summary, href, sample = false } = Astro.props;
+
+const format = (iso: string, options: Intl.DateTimeFormatOptions) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { timeZone: 'UTC', ...options });
+
+const day = format(date, { day: '2-digit' });
+const month = format(date, { month: 'short', year: 'numeric' });
+const when = endDate
+  ? `${format(date, { day: 'numeric', month: 'short' })} – ${format(endDate, { day: 'numeric', month: 'short', year: 'numeric' })}`
+  : format(date, { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Card>
+  <div class="flex gap-5">
+    <div class="w-16 shrink-0 border-r border-line pr-5 text-center">
+      <p class="font-display text-3xl leading-none text-accent">{day}</p>
+      <p class="mt-1.5 font-mono text-[0.66rem] uppercase tracking-[0.12em] text-muted">{month}</p>
+    </div>
+    <div class="min-w-0">
+      <div class="flex flex-wrap items-center gap-2">
+        {type && <Badge tone="highlight">{type}</Badge>}
+        {sample && <SampleTag />}
+      </div>
+      <h3 class:list={['text-lg leading-snug', (type || sample) && 'mt-3']}>
+        {
+          href ? (
+            <a href={href} class="underline-offset-4 hover:text-accent hover:underline">{title}</a>
+          ) : (
+            title
+          )
+        }
+      </h3>
+      <p class="mt-2 text-sm text-muted">
+        {when}
+        {venue && ` · ${venue}`}
+      </p>
+      {summary && <p class="mt-4 text-sm leading-relaxed text-muted">{summary}</p>}
+    </div>
+  </div>
+</Card>

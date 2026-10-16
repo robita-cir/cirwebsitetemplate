@@ -1,0 +1,323 @@
+@import "tailwindcss";
+
+/*
+ * CIR design tokens (light theme only)
+ * ------------------------------------
+ * Navy and teal palette. Text pairs meet WCAG 2.2 AA.
+ * The brand teal is for lines, dots and fills only; text uses the deeper `accent` teal.
+ */
+
+@theme inline {
+  --font-display: "Source Serif 4 Variable", "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-paper: var(--paper);
+  --color-band: var(--band);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-brand: var(--brand);
+  --color-highlight: var(--highlight);
+
+  --container-page: 76rem;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: light;
+  --paper: #ffffff;
+  --band: #f6f7f9; /* alternate section background */
+  --ink: #101030; /* 17.6:1 on white */
+  --muted: #4a4f66; /* 7.7:1 on white */
+  --line: #d9dce3; /* rules and borders only */
+  --accent: #17766a; /* 5.5:1 on white */
+  --on-accent: #ffffff;
+  --brand: #30a090; /* decorative */
+  --highlight: #8a5a12; /* 5.9:1 on white */
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 3.4vw + 1rem, 3.9rem);
+    line-height: 1.06;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 2.4vw + 1rem, 2.75rem);
+    line-height: 1.12;
+  }
+
+  h3 {
+    font-size: clamp(1.2rem, 0.8vw + 1rem, 1.4rem);
+    line-height: 1.25;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--brand);
+    color: var(--ink);
+  }
+
+  /* Long names, titles, addresses and links must wrap instead of pushing the layout sideways.
+     "anywhere" also shrinks the minimum width of grid and flex items, which "break-word" does not. */
+  body {
+    overflow-wrap: anywhere;
+  }
+
+  /* The main landmark takes focus after the skip link; no outline is needed around the whole page. */
+  #main:focus {
+    outline: none;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    background: var(--accent);
+    color: var(--on-accent);
+    padding: 0.6rem 1rem;
+    border-radius: 0.375rem;
+    transition: top 0.2s;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  /* Markdown bodies: profiles, projects, news and events. */
+  .prose-cir {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+
+  .prose-cir > * + * {
+    margin-top: 1.25em;
+  }
+
+  .prose-cir h2 {
+    margin-top: 2.25em;
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
+  .prose-cir h3 {
+    margin-top: 1.75em;
+    font-size: 1.3rem;
+  }
+
+  .prose-cir p,
+  .prose-cir li {
+    color: var(--ink);
+  }
+
+  .prose-cir ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+
+  .prose-cir ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
+  }
+
+  .prose-cir li + li {
+    margin-top: 0.4em;
+  }
+
+  .prose-cir a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .prose-cir blockquote {
+    border-left: 2px solid var(--accent);
+    padding-left: 1rem;
+    color: var(--muted);
+  }
+
+  .prose-cir img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .prose-cir code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--band);
+    padding: 0.1em 0.3em;
+  }
+
+  /* Faint engineering grid for figures */
+  .figure-grid {
+    background-image:
+      linear-gradient(to right, rgb(217 220 227 / 0.55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(217 220 227 / 0.55) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
+
+/* Motion
+ * ------
+ * Scroll reveal: elements with [data-reveal] fade up once (JS in Layout adds .is-visible).
+ * Without JS, content is always visible.
+ * Hero entrance: .rise is a CSS animation, so it works without JS.
+ */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1rem, 0);
+  transition:
+    opacity 800ms var(--ease-out-expo) var(--reveal-delay, 0ms),
+    transform 800ms var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+
+html.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 900ms var(--ease-out-expo) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+/* Stagger steps for the hero entrance. Classes rather than inline styles, so the markup stays valid. */
+.rise-d0 { --rise-delay: 0ms; }
+.rise-d120 { --rise-delay: 120ms; }
+.rise-d200 { --rise-delay: 200ms; }
+.rise-d240 { --rise-delay: 240ms; }
+.rise-d360 { --rise-delay: 360ms; }
+
+/* Text inside the SVG figures. */
+.fig-mono { font-family: var(--font-mono); }
+.fig-math { font-family: var(--font-display); font-style: italic; }
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal],
+  .rise {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print: the content, not the chrome. Navigation, search, buttons and decorative figures are dropped. */
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  html,
+  body {
+    background: #ffffff;
+    color: #000000;
+    font-size: 11pt;
+  }
+
+  .skip-link,
+  header,
+  nav,
+  footer,
+  .sub-nav,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  a {
+    color: #000000;
+    text-decoration: underline;
+  }
+
+  /* Show link targets next to external links, so a printed page still points somewhere. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #444444;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  article,
+  li,
+  figure {
+    break-inside: avoid;
+  }
+
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

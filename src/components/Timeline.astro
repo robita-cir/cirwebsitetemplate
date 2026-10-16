@@ -1,0 +1,28 @@
+---
+// Dated milestones. `label` is the year or period shown in the left column.
+interface Item {
+  label: string;
+  title: string;
+  text: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<ol class="border-y border-line">
+  {
+    items.map((item) => (
+      <li class="grid gap-3 border-b border-line py-8 last:border-b-0 md:grid-cols-[12rem_1fr] md:gap-12" data-reveal>
+        <p class="font-display text-2xl font-medium leading-tight text-accent">{item.label}</p>
+        <div>
+          <h3 class="text-[1.3rem]">{item.title}</h3>
+          <p class="mt-2 max-w-2xl leading-relaxed text-muted">{item.text}</p>
+        </div>
+      </li>
+    ))
+  }
+</ol>

@@ -1,0 +1,69 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { site } from '../config/site';
+
+const phoneHref = `tel:${site.phone.replace(/\s/g, '')}`;
+
+// Enquiry types. The centre publishes one address, so the subject line tells the office where a message belongs.
+const enquiries = [
+  { title: 'Research and projects', text: 'Questions about research directions, student projects and collaboration.' },
+  { title: 'Study and internships', text: 'Postgraduate study, internships, research scholar positions and training programmes.' },
+  { title: 'Partnerships', text: 'Joint research, industry pilots and funded programmes.' },
+  { title: 'Support and donations', text: 'Giving to the centre, and CSR or tax-benefit questions.' },
+];
+---
+
+<Layout title="Contact" description="How to contact the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Contact"
+    title="Contact the centre"
+    lead="Write to the centre or call the centre office. Put the enquiry type in the subject line, so that it reaches the right person."
+  />
+
+  <section class="mx-auto grid w-full max-w-page gap-14 px-5 py-24 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
+    <div class="space-y-12">
+      <div class="border-t-2 border-accent pt-6">
+        <p class="eyebrow">Email</p>
+        <a href={`mailto:${site.email}`} class="mt-4 block font-display text-[2rem] leading-tight text-ink underline-offset-4 hover:text-accent hover:underline">
+          {site.email}
+        </a>
+      </div>
+      <div class="border-t border-line pt-6">
+        <p class="eyebrow">Telephone</p>
+        <a href={phoneHref} class="mt-4 block font-display text-[2rem] leading-tight text-ink underline-offset-4 hover:text-accent hover:underline"><span set:html={site.phoneHtml} /></a>
+      </div>
+      <div class="border-t border-line pt-6">
+        <p class="eyebrow">Address</p>
+        <address class="mt-4 not-italic text-[1.15rem] leading-relaxed text-ink">
+          {site.address.map((line) => (<span class="block">{line}</span>))}
+        </address>
+        <p class="mt-5 max-w-md text-sm leading-relaxed text-muted">
+          Placeholder note: describe how to find the centre on the campus.
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="eyebrow">Enquiries</h2>
+      <ul class="mt-6 divide-y divide-line border-y border-line">
+        {
+          enquiries.map((item) => (
+            <li class="grid gap-2 py-6 md:grid-cols-[12rem_1fr] md:gap-8">
+              <h3 class="text-[1.15rem]">{item.title}</h3>
+              <p class="text-sm leading-relaxed text-muted">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-10 flex flex-wrap gap-x-8 gap-y-4">
+        <Button href={`mailto:${site.email}?subject=Enquiry`} variant="primary">Send an email</Button>
+      </div>
+      <p class="mt-10 max-w-lg text-sm leading-relaxed text-muted">
+        This site has no contact form yet. Enquiries go by email, so that replies come from the centre office and no personal data is stored on the website.
+      </p>
+    </div>
+  </section>
+</Layout>

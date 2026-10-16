@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Button from '../../components/Button.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import NewsItem from '../../components/NewsItem.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import SubNav from '../../components/SubNav.astro';
+import { site } from '../../config/site';
+import { isoDate } from '../../lib/format';
+
+const kindNames: Record<string, string> = { news: 'News', announcement: 'Announcement', insight: 'Insight' };
+
+const articles = (await getCollection('news')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const subNav = [
+  { href: '#latest', label: 'Latest' },
+  { href: '#press', label: 'Press and media' },
+];
+---
+
+<Layout title="News" description="News, announcements and insights from the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="News"
+    title="News, announcements and insights"
+    lead="What the centre is doing, what it has announced, and short pieces that explain the research for a general audience."
+  />
+  <SubNav label="On this page" items={subNav} />
+
+  <section id="latest" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Latest" title="Latest stories" />
+    <div class="mt-14">
+      {
+        articles.length > 0 ? (
+          <ul class="border-b border-line">
+            {articles.map((article) => (
+              <NewsItem
+                date={isoDate(article.data.date)}
+                title={article.data.title}
+                href={`/news/${article.id}/`}
+                kind={kindNames[article.data.kind]}
+                sample={article.data.sample}
+              />
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No news has been published yet">
+            Announcements and articles will appear here. Upcoming workshops and talks are listed on the Events page.
+          </EmptyState>
+        )
+      }
+    </div>
+    <div class="mt-10">
+      <Button href="/events/" variant="link">Upcoming workshops and events →</Button>
+    </div>
+  </section>
+
+  <section id="press" class="scroll-mt-40 bg-band">
+    <div class="mx-auto grid w-full max-w-page gap-14 px-5 py-24 sm:px-8 lg:grid-cols-2">
+      <div>
+        <SectionHeader number="02" label="Press and media" title="For journalists" />
+        <p class="mt-8 max-w-lg text-lg leading-relaxed text-muted">
+          For interviews, photographs and background on the centre's research, write to the centre office. Please include your publication and deadline.
+        </p>
+        <div class="mt-8">
+          <Button href={`mailto:${site.email}?subject=Media%20enquiry`} variant="primary">Media enquiries</Button>
+        </div>
+      </div>
+      <div>
+        <p class="eyebrow">Press kit</p>
+        <div class="mt-6">
+          <EmptyState title="Press kit to be added">
+            The press kit will contain the centre's logo files, a short description of the centre, and approved photographs with captions. It will be posted here once it is ready.
+          </EmptyState>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

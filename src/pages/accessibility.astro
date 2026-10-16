@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import ProseWrap from '../components/ProseWrap.astro';
+import { site } from '../config/site';
+---
+
+<Layout title="Accessibility statement" description="How accessible the Centre for Intelligent Robotics website is, what is known to be missing, and how to report a problem." noindex={false}>
+  <PageHero eyebrow="Legal" title="Accessibility statement" lead="We want everyone to be able to use this website, whatever their device, browser or way of reading." />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <div class="mb-12 max-w-[68ch] border-l-2 border-highlight bg-highlight/10 p-5 text-sm leading-relaxed text-ink" data-print-hide>
+      <strong class="font-medium">Draft for review.</strong> This statement must be checked by the institute before it is published. The date and response details in square brackets must be completed.
+    </div>
+
+    <ProseWrap>
+      <h2>Our commitment</h2>
+      <p>This website aims to meet the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA.</p>
+
+      <h2>What is in place</h2>
+      <ul>
+        <li>Keyboard navigation through every page, with a visible focus outline and a skip link at the top of each page.</li>
+        <li>Headings in order, one main heading per page, and landmarks for the header, main content, navigation and footer.</li>
+        <li>Text colours checked against their backgrounds for contrast.</li>
+        <li>Animation is turned off for people who ask their device for reduced motion. Content does not depend on animation.</li>
+        <li>Pages are readable without JavaScript. The only features that need it are the statistics count-up, the reveal animations and the site search.</li>
+        <li>Diagrams have a text title and description.</li>
+      </ul>
+
+      <h2>Known limitations</h2>
+      <ul>
+        <li>Some photographs have not yet been supplied. Placeholder frames stand in for them, and each frame has a text label.</li>
+        <li>Some entries are marked as sample content. Sample text is a template and will be replaced.</li>
+        <li>On small screens the in-page navigation scrolls sideways. The links are all reachable by keyboard.</li>
+        <li>Documents published as PDFs are not yet checked for accessibility. Where a PDF is the only version, we will add a short text summary on its page.</li>
+      </ul>
+
+      <h2>Feedback and contact</h2>
+      <p>If you cannot use part of this website, please tell us. Write to <a href={`mailto:${site.email}?subject=Accessibility%20feedback`}>{site.email}</a> or call {site.phone}. Say which page you were on and what you were trying to do. We aim to reply within [number] working days.</p>
+
+      <h2>Enforcement</h2>
+      <p>If you are not satisfied with our reply, you may contact the institute's grievance channel. [Add the institute's accessibility or grievance contact here.]</p>
+
+      <h2>Last reviewed</h2>
+      <p>This statement was last reviewed on [date]. The site was tested with automated accessibility checks and by hand on [date]. [Record the tools and browsers used.]</p>
+    </ProseWrap>
+  </section>
+</Layout>

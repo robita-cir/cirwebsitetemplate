@@ -1,0 +1,87 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import EmptyState from '../components/EmptyState.astro';
+import PageHero from '../components/PageHero.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import SubNav from '../components/SubNav.astro';
+import { site } from '../config/site';
+
+const publications = (await getCollection('publications')).sort((a, b) => {
+  if (b.data.year !== a.data.year) return b.data.year - a.data.year;
+  return a.data.title.localeCompare(b.data.title);
+});
+
+const years = [...new Set(publications.map((publication) => publication.data.year))].sort((a, b) => b - a);
+const byYear = years.map((year) => ({
+  year,
+  items: publications.filter((publication) => publication.data.year === year),
+}));
+
+const subNav = [
+  { href: '#list', label: 'All publications' },
+  { href: '#contribute', label: 'Send a publication' },
+];
+---
+
+<Layout title="Publications" description="Journal articles, conference papers, workshop papers and theses from the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Publications"
+    title="Papers, articles and theses"
+    lead="Published work from the centre's faculty, research scholars and students, listed by year, with links to the DOI where one exists."
+  />
+  <SubNav label="On this page" items={subNav} />
+
+  <section id="list" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Publications" title="All publications, by year" />
+    <div class="mt-16 space-y-20">
+      {
+        byYear.length > 0 ? (
+          byYear.map((group) => (
+            <div>
+              <div class="flex items-baseline justify-between gap-6 border-b-2 border-accent pb-4">
+                <h3 class="text-[1.6rem]">{group.year}</h3>
+                <p class="font-mono text-xs uppercase tracking-[0.1em] text-muted">
+                  {group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}
+                </p>
+              </div>
+              <ul class="border-b border-line">
+                {group.items.map((publication) => (
+                  <PublicationItem
+                    title={publication.data.title}
+                    authors={publication.data.authors}
+                    venue={publication.data.venue}
+                    year={publication.data.year}
+                    type={publication.data.type}
+                    doi={publication.data.doi}
+                    url={publication.data.url}
+                    sample={publication.data.sample}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))
+        ) : (
+          <EmptyState title="No publications are listed yet">
+            The centre's publication list will appear here once it is supplied.
+          </EmptyState>
+        )
+      }
+    </div>
+  </section>
+
+  <section id="contribute" class="scroll-mt-40 bg-band">
+    <div class="mx-auto grid w-full max-w-page gap-10 px-5 py-24 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
+      <div>
+        <SectionHeader number="02" label="Send a publication" title="Missing a paper?" />
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+          If a paper with a centre affiliation is missing, send the title, authors, venue, year and DOI to the centre office. Entries are checked before they are added.
+        </p>
+      </div>
+      <a href={`mailto:${site.email}?subject=Publication%20listing`} class="inline-flex items-center justify-center bg-accent px-6 py-3.5 text-sm font-medium text-on-accent transition-colors hover:bg-ink">
+        Send details to the centre
+      </a>
+    </div>
+  </section>
+</Layout>

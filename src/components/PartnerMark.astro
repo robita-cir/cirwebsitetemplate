@@ -1,0 +1,16 @@
+---
+// Partner cell: name, country and an optional one-line summary. Swap the name for a logo when collected.
+interface Props {
+  name: string;
+  country?: string;
+  summary?: string;
+}
+
+const { name, country, summary } = Astro.props;
+---
+
+<li class="flex min-h-28 flex-col border border-line bg-paper p-6">
+  <span class="font-display text-[1.1rem] leading-snug text-ink">{name}</span>
+  {summary && <span class="mt-2 text-sm leading-relaxed text-muted">{summary}</span>}
+  {country && <span class="mt-auto pt-4 font-mono text-[0.66rem] uppercase tracking-[0.12em] text-muted">{country}</span>}
+</li>

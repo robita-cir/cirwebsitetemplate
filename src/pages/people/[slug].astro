@@ -1,0 +1,136 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Badge from '../../components/Badge.astro';
+import Button from '../../components/Button.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProjectRow from '../../components/ProjectRow.astro';
+import ProseWrap from '../../components/ProseWrap.astro';
+import SampleTag from '../../components/SampleTag.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { byOrder } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const people = await getCollection('people');
+  return people.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const groupLabels: Record<string, string> = {
+  faculty: 'Faculty',
+  scholar: 'Research scholar',
+  mtech: 'M.Tech student',
+  'alumni-research': 'Research alumnus',
+  'alumni-mtech': 'M.Tech alumnus',
+  'alumni-btech': 'B.Tech alumnus',
+};
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const hasBody = entry.body !== undefined && entry.body.trim().length > 0;
+
+const projects = (await getCollection('projects'))
+  .filter((project) => project.data.students.includes(entry.data.name))
+  .sort(byOrder);
+
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'People', href: '/people/' },
+  { label: entry.data.name },
+];
+const lead = [entry.data.role, entry.data.dept].filter(Boolean).join(', ');
+---
+
+<Layout title={entry.data.name} description={`${entry.data.name}: ${groupLabels[entry.data.group]} at the Centre for Intelligent Robotics.`}>
+  <PageHero
+    eyebrow={groupLabels[entry.data.group]}
+    title={entry.data.name}
+    lead={lead || undefined}
+    crumbs={crumbs}
+    sample={entry.data.sample}
+  />
+
+  <section class="mx-auto grid w-full max-w-page gap-16 px-5 py-24 sm:px-8 lg:grid-cols-[18rem_1fr]">
+    <aside class="space-y-8">
+      {entry.data.photo && <img src={entry.data.photo} alt={entry.data.name} class="aspect-[4/5] w-full max-w-xs border border-line object-cover" />}
+      <dl class="space-y-6 text-sm">
+        {entry.data.role && (
+          <div>
+            <dt class="eyebrow">Role</dt>
+            <dd class="mt-2 text-ink">{entry.data.role}</dd>
+          </div>
+        )}
+        {entry.data.dept && (
+          <div>
+            <dt class="eyebrow">Department</dt>
+            <dd class="mt-2 text-ink">{entry.data.dept}</dd>
+          </div>
+        )}
+        <div>
+          <dt class="eyebrow">Interests</dt>
+          <dd class="mt-2">
+            {entry.data.interests.length > 0 ? (
+              <ul class="flex flex-wrap gap-2">
+                {entry.data.interests.map((interest) => (
+                  <li><Badge>{interest}</Badge></li>
+                ))}
+              </ul>
+            ) : (
+              <span class="text-muted">To be added.</span>
+            )}
+          </dd>
+        </div>
+        {entry.data.homepage && (
+          <div>
+            <dt class="eyebrow">Homepage</dt>
+            <dd class="mt-2">
+              <a href={entry.data.homepage} class="break-all text-accent underline-offset-4 hover:underline">{entry.data.homepage}</a>
+            </dd>
+          </div>
+        )}
+      </dl>
+    </aside>
+
+    <div>
+      <SectionHeader label="Profile" title="About" />
+      <div class="mt-10">
+        {
+          hasBody ? (
+            <ProseWrap>
+              <Content />
+            </ProseWrap>
+          ) : (
+            <EmptyState title="Biography to be added">
+              The profile text, research summary and contact details for {entry.data.name} will appear here once they are supplied by the person or the centre.
+            </EmptyState>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  {
+    projects.length > 0 && (
+      <section class="bg-band">
+        <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+          <SectionHeader number="01" label="Projects" title="Student projects" lead="Projects that list this person among their students." />
+          <ul class="mt-14 border-b border-line">
+            {projects.map((project) => (
+              <ProjectRow
+                title={project.data.title}
+                team={project.data.students.join(', ')}
+                status={project.data.status}
+                href={`/research/projects/${project.id}/`}
+                sample={project.data.sample}
+              />
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="mx-auto w-full max-w-page px-5 py-16 sm:px-8">
+    <Button href="/people/" variant="link">← Back to all people</Button>
+  </section>
+</Layout>

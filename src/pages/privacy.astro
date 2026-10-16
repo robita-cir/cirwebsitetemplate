@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import ProseWrap from '../components/ProseWrap.astro';
+import { site } from '../config/site';
+---
+
+<Layout title="Privacy notice" description="What personal information the Centre for Intelligent Robotics website collects, and why." noindex={false}>
+  <PageHero eyebrow="Legal" title="Privacy notice" lead="This site is designed to collect as little personal information as possible." />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <div class="mb-12 max-w-[68ch] border-l-2 border-highlight bg-highlight/10 p-5 text-sm leading-relaxed text-ink" data-print-hide>
+      <strong class="font-medium">Draft for review.</strong> Check this notice against the institute's data policy before publication, and complete the bracketed details.
+    </div>
+
+    <ProseWrap>
+      <h2>What this website collects</h2>
+      <p>The website itself does not use analytics, advertising or tracking cookies, and it has no contact form and no accounts.</p>
+      <p>The search function runs in your browser. The search terms you type are not sent to a server.</p>
+
+      <h2>When you contact us</h2>
+      <p>If you email the centre at <a href={`mailto:${site.email}`}>{site.email}</a> or call <span set:html={site.phoneHtml} />, we use the information you give us only to reply and to deal with your enquiry. We keep it for [retention period].</p>
+
+      <h2>Photographs and names</h2>
+      <p>Photographs of people are published only with their permission. If you appear in a photograph and would like it removed, write to the centre and we will act on the request.</p>
+
+      <h2>Profile information</h2>
+      <p>Names, roles and research interests on the People pages come from the centre's records. If you would like your entry corrected or removed, write to the centre.</p>
+
+      <h2>Your rights</h2>
+      <p>You can ask what information we hold about you, ask for it to be corrected, and ask for it to be deleted, where the law allows. Write to the centre at the address below.</p>
+
+      <h2>Controller and contact</h2>
+      <p>[Name of the data controller, as set by the institute.] {site.name}, {site.institute}, {site.address.join(', ')}.</p>
+
+      <h2>Changes to this notice</h2>
+      <p>We will update this notice when the site changes how it handles information. The date of the last change is shown below.</p>
+      <p>Last updated: [date].</p>
+    </ProseWrap>
+  </section>
+</Layout>

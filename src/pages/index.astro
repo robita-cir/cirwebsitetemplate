@@ -1,0 +1,193 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import ManipulatorFigure from '../components/ManipulatorFigure.astro';
+import NewsItem from '../components/NewsItem.astro';
+import PartnerMark from '../components/PartnerMark.astro';
+import PersonCard from '../components/PersonCard.astro';
+import ProjectRow from '../components/ProjectRow.astro';
+import ResearchArea from '../components/ResearchArea.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Stat from '../components/Stat.astro';
+import { site } from '../config/site';
+import { byOrder, isoDate, kindLabel, newsKindLabel } from '../lib/format';
+
+// Every list on this page comes from src/content. Edit the files, not this page.
+const [people, projects, areas, events, partners, funding, newsItems] = await Promise.all([
+  getCollection('people'),
+  getCollection('projects'),
+  getCollection('research'),
+  getCollection('events'),
+  getCollection('partners'),
+  getCollection('funding'),
+  getCollection('news'),
+]);
+
+const stats = [
+  { value: projects.length, label: 'Student research projects' },
+  { value: funding.length, label: 'Externally funded programmes' },
+  {
+    value: events.filter((event) => event.data.series === 'series-1').length,
+    label: 'Editions of the workshop series',
+  },
+];
+
+const researchAreas = [...areas].sort(byOrder).map((area) => ({
+  code: area.data.code,
+  title: area.data.title,
+  description: area.data.description,
+  examples: projects
+    .filter((project) => project.data.area === area.id)
+    .sort(byOrder)
+    .slice(0, 2)
+    .map((project) => project.data.title),
+}));
+
+// The three most recent items across events and news.
+const news = [
+  ...events.map((event) => ({
+    date: event.data.date,
+    title: event.data.title,
+    kind: kindLabel[event.data.kind],
+    href: `/events/${event.id}/`,
+    sample: event.data.sample,
+  })),
+  ...newsItems.map((item) => ({
+    date: item.data.date,
+    title: item.data.title,
+    kind: newsKindLabel[item.data.kind],
+    href: `/news/${item.id}/`,
+    sample: item.data.sample,
+  })),
+]
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
+  .slice(0, 3)
+  .map((item) => ({ ...item, date: isoDate(item.date) }));
+
+const faculty = people
+  .filter((person) => person.data.group === 'faculty')
+  .sort(byOrder)
+  .slice(0, 4);
+
+const featuredProjects = projects
+  .filter((project) => project.data.featured)
+  .sort(byOrder)
+  .slice(0, 4);
+
+const featuredPartners = partners
+  .filter((partner) => partner.data.featured && partner.data.status === 'present')
+  .sort((a, b) => (a.data.kind === b.data.kind ? a.data.order - b.data.order : a.data.kind === 'academic' ? -1 : 1));
+---
+
+<Layout title={site.name} description={site.description}>
+  <!-- Hero -->
+  <section class="mx-auto grid w-full max-w-page items-center gap-14 px-5 pb-20 pt-8 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:pb-28 lg:pt-12">
+    <div>
+      <p class="eyebrow rise rise-d0">{site.name} · {site.instituteShort}</p>
+      <h1 class="rise rise-d120 mt-7 max-w-[17ch]">
+        Intelligent robots that perceive, reason and work alongside people.
+      </h1>
+      <p class="rise rise-d240 mt-8 max-w-xl text-lg leading-relaxed text-muted">
+        The centre conducts research, training and product development in intelligent robotics, from perception and manipulation to human–robot interaction and assistive systems.
+      </p>
+      <div class="rise rise-d360 mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+        <Button href="/research/" variant="primary">Explore research</Button>
+        <Button href="/people/" variant="outline">Meet the team</Button>
+      </div>
+    </div>
+
+    <div class="rise rise-d200">
+      <ManipulatorFigure />
+      <p class="mt-4 font-mono text-[0.72rem] leading-relaxed tracking-[0.02em] text-muted">
+        Fig. 1 · Planar three-link manipulator: joint angles θ₁–θ₃ and link lengths l₁–l₃.
+      </p>
+    </div>
+  </section>
+
+  <!-- Key figures -->
+  <section class="border-y border-line bg-band" aria-label="Centre at a glance">
+    <div class="mx-auto grid w-full max-w-page gap-12 px-5 py-14 sm:px-8 md:grid-cols-3 md:divide-x md:divide-line md:gap-0">
+      {stats.map((stat) => <Stat value={stat.value} label={stat.label} />)}
+    </div>
+  </section>
+
+  <!-- Research -->
+  <section id="research" class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Research" title="Four research directions" lead="Work across the centre's groups, drawn from current student projects, funded programmes and workshops." />
+    <div class="mt-16 grid gap-12 md:grid-cols-2 xl:grid-cols-4 xl:gap-8">
+      {researchAreas.map((area) => <ResearchArea code={area.code} title={area.title} description={area.description} examples={area.examples} />)}
+    </div>
+  </section>
+
+  <!-- News -->
+  <section class="bg-band" aria-labelledby="news-heading">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="News and events" title="Recent activity" id="news-heading" />
+      <ul class="mt-14 border-b border-line">
+        {news.map((item) => <NewsItem date={item.date} title={item.title} kind={item.kind} href={item.href} sample={item.sample} />)}
+      </ul>
+      <div class="mt-10">
+        <Button href="/events/" variant="link">All events and workshops →</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- People -->
+  <section id="people" class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeader number="03" label="People" title="Faculty" lead="Faculty supervise research groups, teach, and lead the centre's programmes." />
+      <Button href="/people/" variant="link" class="shrink-0">All people and students →</Button>
+    </div>
+    <div class="mt-16 grid gap-x-8 gap-y-16 sm:grid-cols-2 xl:grid-cols-4">
+      {faculty.map((person) => <PersonCard name={person.data.name} role={person.data.role} dept={person.data.dept} photo={person.data.photo} href={`/people/${person.id}/`} />)}
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="mx-auto w-full max-w-page px-5 pb-24 sm:px-8">
+    <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <SectionHeader number="04" label="Projects" title="Selected student projects" lead="A sample of current work. The full list, grouped by research area, is on the research page." />
+      <Button href="/research/#projects" variant="link" class="shrink-0">All projects →</Button>
+    </div>
+    <ul class="mt-14 border-b border-line">
+      {featuredProjects.map((project) => <ProjectRow title={project.data.title} team={project.data.students.join(', ')} href={`/research/projects/${project.id}/`} sample={project.data.sample} />)}
+    </ul>
+  </section>
+
+  <!-- Partners -->
+  <section class="bg-band" aria-labelledby="partners-heading">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="05" label="Collaborations" title="Partners and collaborators" id="partners-heading" />
+      <ul class="mt-14 grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+        {featuredPartners.map((partner) => <PartnerMark name={partner.data.name} country={partner.data.country} />)}
+      </ul>
+      <div class="mt-10">
+        <Button href="/partners/" variant="link">All partners and collaborators →</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to action -->
+  <section class="mx-auto grid w-full max-w-page gap-14 px-5 py-24 sm:px-8 md:grid-cols-2">
+    <div class="border-t-2 border-accent pt-8">
+      <h2 class="max-w-md text-[2rem]">Study, research or teach with us</h2>
+      <p class="mt-5 max-w-md text-lg leading-relaxed text-muted">
+        Enquiries about research projects, postgraduate study, internships and training programmes go to the centre office.
+      </p>
+      <div class="mt-9">
+        <Button href="/contact/" variant="primary">Contact the centre</Button>
+      </div>
+    </div>
+    <div class="border-t-2 border-line pt-8">
+      <h2 class="max-w-md text-[2rem]">Collaborate or support the centre</h2>
+      <p class="mt-5 max-w-md text-lg leading-relaxed text-muted">
+        Industry partners, funders and alumni can start joint projects, sponsor research or support the centre's programmes.
+      </p>
+      <div class="mt-9 flex flex-wrap gap-x-8 gap-y-4">
+        <Button href="/partners/" variant="outline">Partnerships</Button>
+        <Button href="/support/" variant="link">Support the centre →</Button>
+      </div>
+    </div>
+  </section>
+</Layout>

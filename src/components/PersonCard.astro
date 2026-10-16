@@ -1,0 +1,52 @@
+---
+import SampleTag from './SampleTag.astro';
+
+interface Props {
+  name: string;
+  role?: string;
+  dept?: string;
+  interests?: string[];
+  photo?: string;
+  href?: string;
+  sample?: boolean;
+}
+
+const { name, role, dept, interests = [], photo, href, sample = false } = Astro.props;
+
+// Initials fallback when no photo is available. Honorifics are dropped first.
+const initials = name
+  .replace(/^(Prof\.?|Dr\.?|Mr\.?|Ms\.?)\s+/i, '')
+  .split(/\s+/)
+  .filter(Boolean)
+  .map((word) => word[0])
+  .slice(0, 2)
+  .join('')
+  .toUpperCase();
+---
+
+<article class="group min-w-0" data-reveal>
+  <div class="relative aspect-[4/5] w-full overflow-hidden border border-line bg-band">
+    {
+      photo ? (
+        <img src={photo} alt={name} loading="lazy" class="h-full w-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.03]" />
+      ) : (
+        <div aria-hidden="true" class="figure-grid grid h-full place-items-center">
+          <span class="font-display text-6xl font-medium text-accent/60">{initials}</span>
+        </div>
+      )
+    }
+  </div>
+  {sample && <div class="mt-4"><SampleTag /></div>}
+  <h3 class:list={['text-[1.3rem] leading-tight', !sample && 'mt-5']}>
+    {
+      href ? (
+        <a href={href} class="underline-offset-4 hover:text-accent hover:underline">{name}</a>
+      ) : (
+        name
+      )
+    }
+  </h3>
+  {role && <p class="mt-1.5 text-sm font-medium text-ink">{role}</p>}
+  {dept && <p class="text-sm text-muted">{dept}</p>}
+  {interests.length > 0 && <p class="mt-3 text-xs leading-relaxed text-muted">{interests.join(' · ')}</p>}
+</article>

@@ -1,0 +1,107 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { site } from '../config/site';
+
+// Placeholder giving details. Replace them with the institute's own payment and receipt information.
+// Bank account details are intentionally not published here; see the note in "Bank transfer".
+const ways = [
+  {
+    kind: 'By cheque or demand draft',
+    title: 'Payable to “Institute name”',
+    text: 'Placeholder: the postal address and finance office contact for cheques and demand drafts. Replace it with the institute’s own details.',
+  },
+  {
+    kind: 'By bank transfer',
+    title: 'Account details on request',
+    text: 'The centre office provides the current account details on request, so they can be checked against the institute’s records before any transfer. They are not printed on this website.',
+  },
+];
+
+const taxNotes = [
+  {
+    title: 'Individuals and alumni',
+    text: 'Placeholder note on tax eligibility for individual donors. Confirm the wording with the finance office.',
+  },
+  {
+    title: 'Companies (CSR)',
+    text: 'Placeholder note on tax eligibility for companies and CSR contributions. Confirm the wording with the finance office.',
+  },
+];
+
+const tiers = ['Platinum', 'Gold', 'Silver', 'Bronze'];
+---
+
+<Layout title="Support" description="How to support the Centre for Intelligent Robotics through donations and CSR.">
+  <PageHero
+    eyebrow="Support"
+    title="Support the centre"
+    lead="Donations help the centre carry out research, train students and build the robotics programmes. Thank you for your interest in the centre."
+  />
+
+  <!-- Ways to give -->
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Giving" title="Two ways to give" lead="Donations are made to the institute and recorded for the centre." />
+    <div class="mt-16 grid gap-6 md:grid-cols-2">
+      {
+        ways.map((way) => (
+          <Card>
+            <p class="eyebrow">{way.kind}</p>
+            <h3 class="mt-4 text-[1.5rem]">{way.title}</h3>
+            <p class="mt-4 leading-relaxed text-muted">{way.text}</p>
+          </Card>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Tax -->
+  <section class="bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Tax and CSR" title="Tax benefits" lead="Placeholder notes on tax eligibility. Confirm the wording with the finance office before publishing." />
+      <div class="mt-16 grid gap-12 md:grid-cols-2">
+        {
+          taxNotes.map((note) => (
+            <div class="border-t-2 border-accent pt-6">
+              <h3 class="text-[1.4rem]">{note.title}</h3>
+              <p class="mt-4 text-lg leading-relaxed text-muted">{note.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Recognition -->
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="Recognition" title="Donor recognition" lead="Donors are recognised in four tiers. A name is listed only after the donor has confirmed that they want it shown." />
+    <ul class="mt-16 grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+      {
+        tiers.map((tier) => (
+          <li class="flex min-h-40 flex-col justify-between bg-paper p-7">
+            <span class="font-mono text-xs uppercase tracking-[0.12em] text-accent">{tier}</span>
+            <span class="mt-10 text-sm text-muted">Names to be confirmed</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- Contact -->
+  <section class="bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <div class="grid gap-10 border-t-2 border-accent pt-10 md:grid-cols-[1fr_auto] md:items-end">
+        <div>
+          <h2 class="max-w-xl text-[2rem]">Questions about giving or CSR?</h2>
+          <p class="mt-5 max-w-xl text-lg leading-relaxed text-muted">
+            Write to the centre and we will point you to the right office for donations, receipts and corporate contributions.
+          </p>
+        </div>
+        <Button href={`mailto:${site.email}?subject=Support%20the%20centre`} variant="primary">Write to the centre</Button>
+      </div>
+    </div>
+  </section>
+</Layout>

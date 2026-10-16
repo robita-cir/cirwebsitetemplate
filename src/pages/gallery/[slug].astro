@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Button from '../../components/Button.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { site } from '../../config/site';
+
+export async function getStaticPaths() {
+  const albums = await getCollection('gallery');
+  return albums.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+
+// Placeholder frames show the grid that photographs will fill. Six is enough to judge the layout.
+const frames = Array.from({ length: 6 }, (_, index) => index + 1);
+
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Gallery', href: '/gallery/' },
+  { label: entry.data.title },
+];
+---
+
+<Layout title={entry.data.title} description={entry.data.description}>
+  <PageHero eyebrow={entry.data.period} title={entry.data.title} lead={entry.data.description} crumbs={crumbs} sample={entry.data.sample} />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Photographs" title="Album" lead="Each photograph is shown with a caption, date and the names of anyone shown, with permission." />
+    <ul class="mt-14 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      {
+        frames.map((number) => (
+          <li>
+            <div
+              role="img"
+              aria-label={`Placeholder ${number}: photograph to be supplied`}
+              class="figure-grid flex aspect-[4/3] items-end border border-line bg-band p-5"
+            >
+              <p class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-muted">Photograph {number} · to be supplied</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mt-14">
+      <EmptyState title="Photographs for this album are being collected">
+        Send photographs from this event to the centre at {site.email}, with the date, a caption, and permission from anyone shown.
+      </EmptyState>
+    </div>
+    <div class="mt-12">
+      <Button href="/gallery/" variant="link">← All albums</Button>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,26 @@
+---
+// In-page navigation for long pages. It sits just below the sticky header (h-20 = top-20).
+interface Props {
+  label: string;
+  items: { href: string; label: string }[];
+}
+
+const { label, items } = Astro.props;
+---
+
+<nav aria-label={label} class="sticky top-20 z-40 border-b border-line bg-paper/95 backdrop-blur">
+  <ul class="mx-auto flex w-full max-w-page gap-8 overflow-x-auto px-5 sm:px-8">
+    {
+      items.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class="block whitespace-nowrap py-4 text-[0.78rem] uppercase tracking-[0.1em] text-muted transition-colors hover:text-ink"
+          >
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

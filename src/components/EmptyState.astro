@@ -1,0 +1,15 @@
+---
+// Honest placeholder for content that is not yet available (for example, publications or photographs).
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="border border-dashed border-line bg-band p-8 md:p-10" data-reveal>
+  <p class="font-display text-xl leading-snug text-ink">{title}</p>
+  <div class="mt-3 max-w-2xl leading-relaxed text-muted">
+    <slot />
+  </div>
+</div>

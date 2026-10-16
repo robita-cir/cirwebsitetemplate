@@ -1,0 +1,32 @@
+---
+import SampleTag from './SampleTag.astro';
+
+interface Props {
+  title: string;
+  team: string;
+  status?: 'Active' | 'Completed' | 'Planned';
+  href?: string;
+  sample?: boolean;
+}
+
+const { title, team, status, href, sample = false } = Astro.props;
+---
+
+<li class="grid gap-2 border-t border-line py-6 md:grid-cols-[1fr_16rem] md:items-baseline md:gap-10" data-reveal>
+  <div class="min-w-0">
+    {sample && <div class="mb-2"><SampleTag /></div>}
+    <h3 class="text-[1.25rem] leading-snug">
+      {
+        href ? (
+          <a href={href} class="underline-offset-4 hover:text-accent hover:underline">{title}</a>
+        ) : (
+          title
+        )
+      }
+    </h3>
+  </div>
+  <p class="flex items-baseline justify-between gap-4 text-sm md:justify-end">
+    <span class="text-ink">{team}</span>
+    {status && <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-muted">{status}</span>}
+  </p>
+</li>

@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import EmptyState from '../components/EmptyState.astro';
+import PageHero from '../components/PageHero.astro';
+import SampleTag from '../components/SampleTag.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { byOrder, longDate } from '../lib/format';
+
+const kindNames: Record<string, string> = {
+  report: 'Report',
+  brochure: 'Brochure',
+  policy: 'Policy',
+  form: 'Form',
+  other: 'Document',
+};
+
+const documents = (await getCollection('documents')).sort(byOrder);
+---
+
+<Layout title="Documents" description="Reports, brochures, policies and forms from the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Documents"
+    title="Reports, brochures and forms"
+    lead="Documents the centre publishes for students, partners and the public. Each entry says when it was published and what it contains."
+  />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Downloads" title="Available documents" />
+    <div class="mt-14">
+      {
+        documents.length > 0 ? (
+          <ul class="border-t border-line">
+            {documents.map((entry) => (
+              <li class="grid gap-4 border-b border-line py-7 md:grid-cols-[8rem_1fr_auto] md:items-center md:gap-10" data-reveal>
+                <div class="font-mono text-xs uppercase tracking-[0.12em] text-muted">
+                  <p class="text-accent">{kindNames[entry.data.kind]}</p>
+                  {entry.data.date && <p class="mt-1">{longDate(entry.data.date)}</p>}
+                </div>
+                <div class="min-w-0">
+                  {entry.data.sample && <div class="mb-2"><SampleTag /></div>}
+                  <h3 class="text-[1.25rem] leading-snug">{entry.data.title}</h3>
+                  <p class="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{entry.data.description}</p>
+                </div>
+                <div>
+                  {entry.data.file ? (
+                    <Button href={entry.data.file} variant="outline">Download PDF</Button>
+                  ) : (
+                    <p class="text-sm text-muted">File to be uploaded</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No documents are published yet">
+            Reports, brochures and policies will be listed here as they are approved for publication.
+          </EmptyState>
+        )
+      }
+    </div>
+  </section>
+</Layout>

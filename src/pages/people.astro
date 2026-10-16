@@ -1,0 +1,145 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import EmptyState from '../components/EmptyState.astro';
+import PageHero from '../components/PageHero.astro';
+import PersonCard from '../components/PersonCard.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import SubNav from '../components/SubNav.astro';
+import { byOrder } from '../lib/format';
+
+const [people, projects] = await Promise.all([getCollection('people'), getCollection('projects')]);
+
+const byGroup = (group: string) => people.filter((person) => person.data.group === group).sort(byOrder);
+
+const faculty = byGroup('faculty');
+const scholars = byGroup('scholar');
+const mtech = byGroup('mtech');
+const alumniResearch = byGroup('alumni-research');
+const alumniMtech = byGroup('alumni-mtech');
+const alumniBtech = byGroup('alumni-btech');
+
+// Show a scholar's project next to their name, when the projects list names them.
+const projectFor = (name: string) => projects.find((project) => project.data.students.includes(name));
+
+const subNav = [
+  { href: '#faculty', label: 'Faculty' },
+  { href: '#scholars', label: 'Research scholars' },
+  { href: '#mtech', label: 'M.Tech' },
+  { href: '#alumni', label: 'Alumni' },
+];
+---
+
+<Layout title="People" description="Faculty, research scholars, M.Tech students and alumni of the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="People"
+    title="The people behind the centre's research"
+    lead="Faculty supervise the research, research scholars and M.Tech students carry out the current projects, and alumni continue the work across industry and academia."
+  />
+  <SubNav label="On this page" items={subNav} />
+
+  <!-- Faculty -->
+  <section id="faculty" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Faculty" title="Faculty" lead="Placeholder lead for the faculty section. Replace it with the departments the faculty belong to." />
+    <div class="mt-16 grid gap-x-8 gap-y-16 sm:grid-cols-2 xl:grid-cols-4">
+      {
+        faculty.map((person) => (
+          <PersonCard
+            name={person.data.name}
+            role={person.data.role}
+            dept={person.data.dept}
+            interests={person.data.interests}
+            photo={person.data.photo}
+            href={`/people/${person.id}/`}
+            sample={person.data.sample}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Research scholars -->
+  <section id="scholars" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Research scholars" title="Research scholars" lead="Current research scholars. Where a scholar leads a student project, the project is listed beside their name." />
+      <ul class="mt-14 grid gap-x-10 border-t border-line md:grid-cols-2">
+        {
+          scholars.map((person) => {
+            const project = projectFor(person.data.name);
+            return (
+              <li class="flex flex-col gap-1 border-b border-line py-5">
+                <a href={`/people/${person.id}/`} class="font-display text-[1.25rem] leading-snug text-ink underline-offset-4 hover:text-accent hover:underline">
+                  {person.data.name}
+                </a>
+                {project && (
+                  <a href={`/research/projects/${project.id}/`} class="text-sm leading-relaxed text-muted underline-offset-4 hover:text-accent hover:underline">
+                    {project.data.title}
+                  </a>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+      {scholars.length === 0 && (
+        <div class="mt-14">
+          <EmptyState title="No research scholars are listed yet">Entries are added from the centre's records.</EmptyState>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- M.Tech -->
+  <section id="mtech" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="M.Tech" title="M.Tech students" />
+    <ul class="mt-14 grid gap-x-10 border-t border-line md:grid-cols-3">
+      {
+        mtech.map((person) => (
+          <li class="border-b border-line py-5">
+            <a href={`/people/${person.id}/`} class="font-display text-[1.25rem] leading-snug text-ink underline-offset-4 hover:text-accent hover:underline">
+              {person.data.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- Alumni -->
+  <section id="alumni" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="04" label="Alumni" title="Alumni" lead="The list is not yet complete. Former members who are not listed are welcome to get in touch with the centre so their names can be added." />
+      <div class="mt-16 grid gap-14 md:grid-cols-3">
+        <div>
+          <h3 class="border-b border-line pb-3 text-[1.3rem]">Research alumni</h3>
+          <ul class="mt-2 divide-y divide-line">
+            {alumniResearch.map((person) => (
+              <li class="py-3"><a href={`/people/${person.id}/`} class="text-ink underline-offset-4 hover:text-accent hover:underline">{person.data.name}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="border-b border-line pb-3 text-[1.3rem]">M.Tech alumni</h3>
+          <ul class="mt-2 divide-y divide-line">
+            {alumniMtech.map((person) => (
+              <li class="py-3"><a href={`/people/${person.id}/`} class="text-ink underline-offset-4 hover:text-accent hover:underline">{person.data.name}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="border-b border-line pb-3 text-[1.3rem]">B.Tech alumni</h3>
+          <ul class="mt-2 divide-y divide-line">
+            {alumniBtech.map((person) => (
+              <li class="py-3"><a href={`/people/${person.id}/`} class="text-ink underline-offset-4 hover:text-accent hover:underline">{person.data.name}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div class="mt-16">
+        <EmptyState title="Know someone who should be listed?">
+          Contact the centre at centre@example.org with the person's name, programme and years at the centre. Names are added after confirmation.
+        </EmptyState>
+      </div>
+    </div>
+  </section>
+</Layout>

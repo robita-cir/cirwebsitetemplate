@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import ProseWrap from '../components/ProseWrap.astro';
+import { site } from '../config/site';
+---
+
+<Layout title="Terms of use" description="Terms for using the Centre for Intelligent Robotics website." noindex={false}>
+  <PageHero eyebrow="Legal" title="Terms of use" lead="The conditions for using this website and the material on it." />
+
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <div class="mb-12 max-w-[68ch] border-l-2 border-highlight bg-highlight/10 p-5 text-sm leading-relaxed text-ink" data-print-hide>
+      <strong class="font-medium">Draft for review.</strong> These terms must be checked by the institute's legal office before publication.
+    </div>
+
+    <ProseWrap>
+      <h2>Use of the website</h2>
+      <p>You may read, print and share the material on this website for personal, educational and non-commercial purposes, provided you credit the {site.name}.</p>
+
+      <h2>Copyright</h2>
+      <p>Unless stated otherwise, the text, images and design of this website belong to the {site.name} or its contributors. Logos belong to their owners and are used with permission.</p>
+
+      <h2>Links to other sites</h2>
+      <p>This site links to other websites, including the institute's website and the student club's website. We do not control those sites and are not responsible for their content or privacy practices.</p>
+
+      <h2>Accuracy</h2>
+      <p>We try to keep the information accurate and up to date. Dates, names and programme details can change, so please confirm anything important with the centre before you act on it.</p>
+
+      <h2>Liability</h2>
+      <p>The material is provided as it is. To the extent the law allows, the centre is not liable for loss arising from the use of this website.</p>
+
+      <h2>Changes</h2>
+      <p>We may change these terms. The latest version is always on this page.</p>
+
+      <h2>Governing law</h2>
+      <p>[Governing law and jurisdiction, as set by the institute.]</p>
+    </ProseWrap>
+  </section>
+</Layout>

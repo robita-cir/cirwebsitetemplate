@@ -1,0 +1,125 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import Badge from '../../../components/Badge.astro';
+import Button from '../../../components/Button.astro';
+import EmptyState from '../../../components/EmptyState.astro';
+import PageHero from '../../../components/PageHero.astro';
+import ProjectRow from '../../../components/ProjectRow.astro';
+import ProseWrap from '../../../components/ProseWrap.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import { byOrder } from '../../../lib/format';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const hasBody = entry.body !== undefined && entry.body.trim().length > 0;
+
+const [areas, people, projects] = await Promise.all([
+  getCollection('research'),
+  getCollection('people'),
+  getCollection('projects'),
+]);
+
+const area = areas.find((candidate) => candidate.id === entry.data.area);
+const areaTitle = area?.data.title ?? 'Other projects';
+const areaHref = area ? `/research/${area.id}/` : '/research/';
+
+// Link each student to their profile when the people list has the same name.
+const profileIdFor = (name: string) => people.find((person) => person.data.name === name)?.id;
+
+const related = projects
+  .filter((project) => project.data.area === entry.data.area && project.id !== entry.id)
+  .sort(byOrder);
+
+const crumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Research', href: '/research/' },
+  { label: areaTitle, href: areaHref },
+  { label: entry.data.title },
+];
+---
+
+<Layout title={entry.data.title} description={entry.data.summary ?? `Student research project: ${entry.data.title}.`}>
+  <PageHero eyebrow={areaTitle} title={entry.data.title} lead={entry.data.summary} crumbs={crumbs} sample={entry.data.sample} />
+
+  <section class="mx-auto grid w-full max-w-page gap-16 px-5 py-24 sm:px-8 lg:grid-cols-[18rem_1fr]">
+    <aside class="space-y-8 text-sm">
+      {entry.data.status && (
+        <div>
+          <p class="eyebrow">Status</p>
+          <p class="mt-3"><Badge tone={entry.data.status === 'Active' ? 'accent' : 'neutral'}>{entry.data.status}</Badge></p>
+        </div>
+      )}
+      <div>
+        <p class="eyebrow">Students</p>
+        <ul class="mt-3 space-y-2">
+          {entry.data.students.map((name) => {
+            const profileId = profileIdFor(name);
+            return (
+              <li class="text-ink">
+                {profileId ? (
+                  <a href={`/people/${profileId}/`} class="underline-offset-4 hover:underline">{name}</a>
+                ) : (
+                  name
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow">Research direction</p>
+        <p class="mt-3">
+          <a href={areaHref} class="text-accent underline-offset-4 hover:underline">{areaTitle}</a>
+        </p>
+      </div>
+    </aside>
+
+    <div>
+      <SectionHeader label="About the project" title="Abstract" />
+      <div class="mt-10">
+        {
+          hasBody ? (
+            <ProseWrap>
+              <Content />
+            </ProseWrap>
+          ) : (
+            <EmptyState title="Abstract to be added">
+              The aims, methods and outcomes of this project will be published here once the students or supervisors supply them.
+            </EmptyState>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section class="bg-band">
+        <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+          <SectionHeader number="01" label="Related" title={`More projects in ${areaTitle.toLowerCase()}`} />
+          <ul class="mt-14 border-b border-line">
+            {related.map((project) => (
+              <ProjectRow
+                title={project.data.title}
+                team={project.data.students.join(', ')}
+                status={project.data.status}
+                href={`/research/projects/${project.id}/`}
+                sample={project.data.sample}
+              />
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="mx-auto w-full max-w-page px-5 py-16 sm:px-8">
+    <Button href={areaHref} variant="link">← Back to {areaTitle}</Button>
+  </section>
+</Layout>

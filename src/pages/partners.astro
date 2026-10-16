@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import PageHero from '../components/PageHero.astro';
+import PartnerMark from '../components/PartnerMark.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import SubNav from '../components/SubNav.astro';
+import { site } from '../config/site';
+import { byOrder } from '../lib/format';
+
+const [partners, funding] = await Promise.all([getCollection('partners'), getCollection('funding')]);
+
+const present = partners.filter((partner) => partner.data.status === 'present');
+const academic = present.filter((partner) => partner.data.kind === 'academic').sort(byOrder);
+const industry = present.filter((partner) => partner.data.kind === 'industry').sort(byOrder);
+const former = partners.filter((partner) => partner.data.status === 'former').sort(byOrder);
+
+const programmes = [...funding].sort(byOrder);
+
+const subNav = [
+  { href: '#academic', label: 'Academic' },
+  { href: '#industry', label: 'Industry' },
+  { href: '#funders', label: 'Funders' },
+  { href: '#former', label: 'Former' },
+];
+---
+
+<Layout title="Partners" description="Academic, industry and funding partners of the Centre for Intelligent Robotics.">
+  <PageHero
+    eyebrow="Partners"
+    title="Partners and collaborators"
+    lead="Placeholder lead for the partners page. Describe the kinds of partners the centre works with."
+  />
+  <SubNav label="On this page" items={subNav} />
+
+  <!-- Academic -->
+  <section id="academic" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="01" label="Academic" title="Universities and research institutes" />
+    <ul class="mt-14 grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+      {academic.map((partner) => <PartnerMark name={partner.data.name} country={partner.data.country} summary={partner.data.summary} />)}
+    </ul>
+  </section>
+
+  <!-- Industry -->
+  <section id="industry" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="02" label="Industry" title="Industry partners" lead="Companies that work with the centre on projects, training and pilot applications." />
+      <ul class="mt-14 grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+        {industry.map((partner) => <PartnerMark name={partner.data.name} country={partner.data.country} summary={partner.data.summary} />)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Funders -->
+  <section id="funders" class="mx-auto w-full max-w-page scroll-mt-40 px-5 py-24 sm:px-8">
+    <SectionHeader number="03" label="Funders" title="Funding bodies and programmes" lead="The programmes that fund the centre’s work. Details are on the research page." />
+    <ul class="mt-14 border-t border-line">
+      {
+        programmes.map((item) => (
+          <li class="grid gap-2 border-b border-line py-6 md:grid-cols-[1fr_1fr] md:gap-10">
+            <p class="font-display text-[1.25rem] leading-snug text-ink">{item.data.title}</p>
+            <p class="text-sm leading-relaxed text-muted">{item.data.funder}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mt-10">
+      <Button href="/research/#funding" variant="link">Funded programmes on the research page →</Button>
+    </div>
+  </section>
+
+  <!-- Former -->
+  <section id="former" class="scroll-mt-40 bg-band">
+    <div class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+      <SectionHeader number="04" label="Former" title="Former collaborators" />
+      <ul class="mt-14 grid gap-px border border-line bg-line sm:grid-cols-2">
+        {former.map((partner) => <PartnerMark name={partner.data.name} country={partner.data.country} summary={partner.data.summary} />)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Call to action -->
+  <section class="mx-auto w-full max-w-page px-5 py-24 sm:px-8">
+    <div class="grid gap-10 border-t-2 border-accent pt-10 md:grid-cols-[1fr_auto] md:items-end">
+      <div>
+        <h2 class="max-w-xl text-[2rem]">Start a collaboration</h2>
+        <p class="mt-5 max-w-xl text-lg leading-relaxed text-muted">
+          Joint research, student exchange, industry pilots and training programmes all start with a conversation. Write to the centre with a short outline.
+        </p>
+      </div>
+      <Button href={`mailto:${site.email}`} variant="primary">Write to the centre</Button>
+    </div>
+  </section>
+</Layout>
