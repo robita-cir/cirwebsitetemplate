@@ -1,6 +1,6 @@
 # CIR Website Template
 
-A static website template for a research centre, built with [Astro](https://astro.build). The layout and design come from the public site of the Centre for Intelligent Robotics (CIR). Every person, project, event and contact detail is a numbered placeholder.
+A static website template for a research centre, built with [Astro](https://astro.build). The layout and design come from the public site of the Centre for Intelligent Robotics (CIR).
 
 Every person, project, event, partner and contact detail in this repository is a numbered placeholder, so every page is filled in and can be checked before the real content is added. Replace the placeholders to make the site your own.
 
