@@ -6,8 +6,21 @@ Every person, project, event, partner and contact detail in this repository is a
 
 There is no backend, login or admin screen. Content is written as Markdown files in `src/content/`. The build writes plain HTML to `dist/`, which any static host can serve.
 
+## Screenshots
+
+| Home | People |
+|---|---|
+| <img src="docs/screenshots/home-desktop.png" alt="Homepage on desktop" width="460"> | <img src="docs/screenshots/people-desktop.png" alt="People page on desktop" width="460"> |
+| Research | Contact |
+| <img src="docs/screenshots/research-desktop.png" alt="Research page on desktop" width="460"> | <img src="docs/screenshots/contact-desktop.png" alt="Contact page on desktop" width="460"> |
+| Home on a phone | People on a phone |
+| <img src="docs/screenshots/home-mobile.png" alt="Homepage on a phone" width="200"> | <img src="docs/screenshots/people-mobile.png" alt="People page on a phone" width="200"> |
+
+All screenshots are in [docs/screenshots](docs/screenshots/README.md), with the list of pages and how to recapture them.
+
 ## Contents
 
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Quick start](#quick-start)
 - [Commands](#commands)

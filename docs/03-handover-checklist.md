@@ -240,7 +240,7 @@ Work through this in order. `npm run check:launch` covers the items marked (auto
 - **Dev server.** Restart `npm run dev` after adding a new route file.
 - **Styleguide.** Internal page for checking components. It is hidden from search engines and must be deleted before launch.
 - **Statistics labels.** The homepage statistics are computed from the content, but their labels are written into the page. Change the labels when the content changes.
-- **Screenshots.** The template has no screenshots. Capture them at desktop and phone widths once the content is settled.
+- **Screenshots.** `docs/screenshots/` shows the template at desktop and phone widths. Recapture them after a change to the design or a page layout, as described in `docs/screenshots/README.md`.
 - **Research directions.** Their names are fixed by the schema (the file names are the ids). The team can change the titles and descriptions freely, but not the ids without a code change.
 
 ## 10. Decisions for the team
